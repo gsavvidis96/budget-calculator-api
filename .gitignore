@@ -1,7 +1,8 @@
-# package directories
 node_modules
-jspm_packages
-
-# Serverless directories
 .serverless
-env.yml
+
+dist
+.env
+.env.*
+!.env.example
+firebase-debug.log

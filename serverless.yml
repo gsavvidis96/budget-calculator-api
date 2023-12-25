@@ -32,3 +32,6 @@ custom:
   plugins:
     development:
       - serverless-offline
+
+plugins:
+  - serverless-dotenv-plugin
