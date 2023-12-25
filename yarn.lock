@@ -3624,10 +3624,10 @@ dreamopt@~0.8.0:
   dependencies:
     wordwrap ">=0.0.2"
 
-drizzle-kit@^0.20.7:
-  version "0.20.7"
-  resolved "https://registry.yarnpkg.com/drizzle-kit/-/drizzle-kit-0.20.7.tgz#61ca8953ceb8c199d94364d65771b33b090122e7"
-  integrity sha512-3LjTvgVAI1jd3JHLG2tMW5ew49NuD7SMymRv+h9xUxb/geS+U/O1yENni0HhyjZH+Gc8hdStL9v1xY9Ob3s3/g==
+drizzle-kit@^0.20.8:
+  version "0.20.8"
+  resolved "https://registry.yarnpkg.com/drizzle-kit/-/drizzle-kit-0.20.8.tgz#bc5d00c9a59c2ed260cb7aff4e1765435c3ed786"
+  integrity sha512-jKvQEmfAuyFHiMWj4rqV2kbtZajN5ntw66qC/btTiePrtnpIBJxIvxCa6al78ZGxcosgz+m07EmhfPftV+NUZQ==
   dependencies:
     "@drizzle-team/studio" "^0.0.35"
     "@esbuild-kit/esm-loader" "^2.5.5"
@@ -3644,10 +3644,10 @@ drizzle-kit@^0.20.7:
     wrangler "^3.7.0"
     zod "^3.20.2"
 
-drizzle-orm@^0.29.1:
-  version "0.29.1"
-  resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.29.1.tgz#0c93efed19718a851d97d23d9ff2dd8b788faf2d"
-  integrity sha512-yItc4unfHnk8XkDD3/bdC63vdboTY7e7I03lCF1OJYABXSIfQYU9BFTQJXMMovVeb3T1/OJWwfW/70T1XPnuUA==
+drizzle-orm@^0.29.2:
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.29.2.tgz#0127e04172335fbab9748917222179405f9302b2"
+  integrity sha512-BhwCwuSQqUoLVc7wtgIkuWexY127Z9+yDbuXU7QWZbMC2XE48jecvAThW9apQaDoaxQmwQ+ObyPfPb4zL4Bgsw==
 
 duplexify@^4.0.0:
   version "4.1.2"

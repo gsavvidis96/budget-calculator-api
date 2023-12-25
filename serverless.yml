@@ -1,11 +1,12 @@
 service: test
 frameworkVersion: "3"
+useDotenv: true
 
 provider:
   name: aws
   region: eu-south-1
   runtime: nodejs18.x
-  profile: ${file(env.yml):${opt:stage}.AWS_PROFILE}
+  profile: ${env:AWS_PROFILE}
   timeout: 20
 
 functions:
@@ -31,7 +32,11 @@ functions:
 custom:
   plugins:
     development:
+      - serverless-dotenv-plugin
       - serverless-offline
+    staging:
+      - serverless-dotenv-plugin
+    production:
+      - serverless-dotenv-plugin
 
-plugins:
-  - serverless-dotenv-plugin
+plugins: ${self:custom.plugins.${opt:stage}}
