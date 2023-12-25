@@ -29,14 +29,6 @@ functions:
           path: /budgets
           method: get
 
-custom:
-  plugins:
-    development:
-      - serverless-dotenv-plugin
-      - serverless-offline
-    staging:
-      - serverless-dotenv-plugin
-    production:
-      - serverless-dotenv-plugin
-
-plugins: ${self:custom.plugins.${opt:stage}}
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
