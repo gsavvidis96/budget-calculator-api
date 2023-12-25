@@ -1,0 +1,34 @@
+service: test
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  region: eu-south-1
+  runtime: nodejs18.x
+  profile: ${file(env.yml):${opt:stage}.AWS_PROFILE}
+  timeout: 20
+
+functions:
+  auth-login:
+    handler: dist/handlers/auth/login.handler
+    events:
+      - httpApi:
+          path: /auth/login
+          method: post
+  auth-currentUser:
+    handler: dist/handlers/auth/currentUser.handler
+    events:
+      - httpApi:
+          path: /auth/current-user
+          method: get
+  budgets-getBudgets:
+    handler: dist/handlers/budgets/getBudgets.handler
+    events:
+      - httpApi:
+          path: /budgets
+          method: get
+
+custom:
+  plugins:
+    development:
+      - serverless-offline
