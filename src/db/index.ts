@@ -2,7 +2,6 @@ import { neon, neonConfig, Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import ws from "ws";
 
-neonConfig.fetchConnectionCache = true;
 neonConfig.webSocketConstructor = ws;
 
 const sql = neon(process.env.DATABASE_URL!);

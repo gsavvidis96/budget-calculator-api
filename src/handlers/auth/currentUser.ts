@@ -9,7 +9,7 @@ export const handler = async (
   const [user] = await dbHttp
     .select()
     .from(users)
-    .where(eq(users.id, "tester@test.com"));
+    .where(eq(users.email, "tester@test.com"));
 
   return {
     statusCode: 200,
