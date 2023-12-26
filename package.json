@@ -4,17 +4,20 @@
     "build": "rimraf dist && npx tsc",
     "start": "rimraf dist && concurrently \"npx tsc --watch\" \"nodemon --exec serverless offline --stage development\"",
     "migrations:generate": "drizzle-kit generate:pg",
-    "migrate": "dotenv -e .env.development -- ts-node migrate.ts",
+    "migrate": "dotenv -e .env.development -- ts-node ./src/db/migrate.ts",
+    "login:development": "dotenv -e .env.development -- ts-node ./src/test/userLogin.ts",
     "test": "vitest"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.6.1",
     "drizzle-orm": "^0.29.2",
-    "firebase-admin": "^12.0.0"
+    "firebase-admin": "^12.0.0",
+    "ws": "^8.15.1"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.130",
     "@types/node": "18.17.1",
+    "@types/ws": "^8.5.10",
     "concurrently": "^8.2.2",
     "dotenv-cli": "^7.3.0",
     "drizzle-kit": "^0.20.8",
