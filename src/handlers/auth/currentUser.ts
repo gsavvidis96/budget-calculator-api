@@ -1,5 +1,5 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
-import { dbHttp } from "../../db";
+import { db } from "../../db";
 import { users } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import { handleError } from "../../helpers/handleError";
@@ -11,7 +11,7 @@ export const handler = async (
   try {
     const decodedUser = await authenticate(event.headers);
 
-    const [user] = await dbHttp
+    const [user] = await db
       .select()
       .from(users)
       .where(eq(users.id, decodedUser.id));

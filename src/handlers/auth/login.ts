@@ -1,6 +1,6 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
 import firebaseAuth from "../../firebaseAuth";
-import { dbHttp } from "../../db";
+import { db } from "../../db";
 import { users } from "../../db/schema";
 
 interface Body {
@@ -23,7 +23,7 @@ export const handler = async (
   }
 
   // upsert user in database with the firebaseUser.uid
-  await dbHttp
+  await db
     .insert(users)
     .values({ id: firebaseUser.uid, email: firebaseUser.email! })
     .onConflictDoNothing({ target: users.id });
