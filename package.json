@@ -12,7 +12,7 @@
     "@neondatabase/serverless": "^0.6.1",
     "drizzle-orm": "^0.29.2",
     "firebase-admin": "^12.0.0",
-    "ws": "^8.15.1"
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.130",
@@ -20,7 +20,7 @@
     "@types/ws": "^8.5.10",
     "concurrently": "^8.2.2",
     "dotenv-cli": "^7.3.0",
-    "drizzle-kit": "^0.20.8",
+    "drizzle-kit": "^0.20.9",
     "firebase": "^10.7.1",
     "nodemon": "^3.0.2",
     "postgres": "^3.4.3",
