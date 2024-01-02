@@ -8,15 +8,9 @@ export const authenticate = async (headers: APIGatewayProxyEventHeaders) => {
 
     const jwt = authHeader?.split(" ")[1]; // get jwt from headers
 
-    let decoded;
+    const decoded = await firebaseAuth.verifyIdToken(jwt || ""); // verify jwt
 
-    try {
-      decoded = await firebaseAuth.verifyIdToken(jwt || ""); // verify jwt
-    } catch (e) {
-      throw e;
-    }
-
-    if (!decoded.userVerified) {
+    if (!decoded?.userVerified) {
       throw new Error("User is not verified");
     }
 
