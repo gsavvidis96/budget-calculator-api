@@ -15,6 +15,27 @@
       "when": 1703594809643,
       "tag": "0001_wandering_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1704562924185,
+      "tag": "0002_unusual_switch",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1704563736627,
+      "tag": "0003_clever_madame_masque",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1704563776706,
+      "tag": "0004_nosy_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }

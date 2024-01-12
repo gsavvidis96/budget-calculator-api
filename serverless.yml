@@ -28,6 +28,12 @@ functions:
       - httpApi:
           path: /budgets
           method: get
+  budgets-newBudget:
+    handler: dist/handlers/budgets/newBudget.handler
+    events:
+      - httpApi:
+          path: /budgets
+          method: post
 
 plugins:
   - serverless-dotenv-plugin

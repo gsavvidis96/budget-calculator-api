@@ -1,3 +1,8 @@
+export interface SerializedError {
+  message: string;
+  field?: string;
+}
+
 export abstract class CustomError extends Error {
   abstract statusCode: number;
 
@@ -7,6 +12,5 @@ export abstract class CustomError extends Error {
     Object.setPrototypeOf(this, CustomError.prototype);
   }
 
-  // TODO: field from validation
-  abstract serializeErrors(): { message: string; field?: string };
+  abstract serializeErrors(): SerializedError;
 }

@@ -1,4 +1,10 @@
-import { varchar, pgTable, text } from "drizzle-orm/pg-core";
+import {
+  varchar,
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
@@ -6,4 +12,19 @@ export const users = pgTable("users", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   email: text("email").unique().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
+export const budgets = pgTable("budgets", {
+  id: varchar("id", { length: 50 })
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  title: text("title").unique().notNull(),
+  isPinned: boolean("is_pinned").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+  userId: varchar("user_id", { length: 50 })
+    .notNull()
+    .references(() => users.id),
 });
