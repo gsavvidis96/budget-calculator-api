@@ -36,6 +36,20 @@
       "when": 1704563776706,
       "tag": "0004_nosy_shinko_yamashiro",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1705138535814,
+      "tag": "0005_parallel_living_tribunal",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1705138939155,
+      "tag": "0006_unique_talisman",
+      "breakpoints": true
     }
   ]
 }

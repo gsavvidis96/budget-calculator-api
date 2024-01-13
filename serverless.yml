@@ -1,11 +1,11 @@
-service: test
+service: budget-calculator-api
 frameworkVersion: "3"
 useDotenv: true
 
 provider:
   name: aws
   region: eu-south-1
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   profile: ${env:AWS_PROFILE}
   timeout: 20
 
@@ -22,18 +22,36 @@ functions:
       - httpApi:
           path: /auth/current-user
           method: get
-  budgets-getBudgets:
-    handler: dist/handlers/budgets/getBudgets.handler
+  budgets-getAll:
+    handler: dist/handlers/budgets/getAll.handler
     events:
       - httpApi:
           path: /budgets
           method: get
-  budgets-newBudget:
-    handler: dist/handlers/budgets/newBudget.handler
+  budgets-create:
+    handler: dist/handlers/budgets/create.handler
     events:
       - httpApi:
           path: /budgets
           method: post
+  budgets-deleteById:
+    handler: dist/handlers/budgets/deleteById.handler
+    events:
+      - httpApi:
+          path: /budgets/{budgetId}
+          method: delete
+  budgets-getById:
+    handler: dist/handlers/budgets/getById.handler
+    events:
+      - httpApi:
+          path: /budgets/{budgetId}
+          method: get
+  budgets-updateById:
+    handler: dist/handlers/budgets/updateById.handler
+    events:
+      - httpApi:
+          path: /budgets/{budgetId}
+          method: patch
 
 plugins:
   - serverless-dotenv-plugin

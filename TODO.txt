@@ -1,5 +1,4 @@
 add tests with vitest
     firebase emulators
     docker compose
-add errors
 add swagger
