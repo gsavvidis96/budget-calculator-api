@@ -1,4 +1,5 @@
-add tests with vitest
-    firebase emulators
-    docker compose
-add swagger
+1. work with docker compose postgres in development
+2. add tests
+3. add swagger
+4. add standalone migration tool along with drizzle (support check constraint, updated_at and more)
+5. add ci in production
