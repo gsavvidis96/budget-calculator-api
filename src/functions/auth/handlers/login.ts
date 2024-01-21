@@ -1,11 +1,11 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
-import firebaseAuth from "../../firebaseAuth";
-import { db } from "../../db";
-import { users } from "../../db/schema";
+import firebaseAuth from "../../../firebaseAuth";
+import { db } from "../../../db";
+import { users } from "../../../db/schema";
 import { object, string } from "yup";
-import { validateBody } from "../../helpers/validateBody";
-import { handleError } from "../../helpers/handleError";
-import { NotAuthorizedError } from "../../errors/notAuthorizedError";
+import { validateBody } from "../../../helpers/validateBody";
+import { handleError } from "../../../helpers/handleError";
+import { NotAuthorizedError } from "../../../errors/notAuthorizedError";
 
 const bodySchema = object({
   idToken: string().required(),

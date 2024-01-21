@@ -5,7 +5,7 @@ import {
   signInWithCustomToken,
   connectAuthEmulator,
 } from "firebase/auth";
-import { handler as loginHandler } from "../handlers/auth/login";
+import { handler as loginHandler } from "../functions/auth/handlers/login";
 import {
   APIGatewayProxyEventV2,
   APIGatewayProxyStructuredResultV2,
@@ -32,6 +32,8 @@ export const login = async () => {
     ); // login with firebase
 
     let idToken = await emailAndPasswordResponse.user.getIdToken(); // get id token
+
+    console.log(idToken);
 
     const result = (await loginHandler({
       body: JSON.stringify({ idToken }),

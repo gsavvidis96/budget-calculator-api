@@ -1,10 +1,10 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
-import { db } from "../../db";
-import { budgets } from "../../db/schema";
-import { handleError } from "../../helpers/handleError";
-import { authenticate } from "../../helpers/authenticate";
+import { db } from "../../../db";
+import { budgets } from "../../../db/schema";
+import { handleError } from "../../../helpers/handleError";
+import { authenticate } from "../../../helpers/authenticate";
 import { object, string } from "yup";
-import { validateBody } from "../../helpers/validateBody";
+import { validateBody } from "../../../helpers/validateBody";
 
 const bodySchema = object({
   title: string().required(),

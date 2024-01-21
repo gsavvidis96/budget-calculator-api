@@ -1,11 +1,11 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
-import { authenticate } from "../../helpers/authenticate";
-import { handleError } from "../../helpers/handleError";
-import { db } from "../../db";
-import { budgets } from "../../db/schema";
+import { authenticate } from "../../../helpers/authenticate";
+import { handleError } from "../../../helpers/handleError";
+import { db } from "../../../db";
+import { budgets } from "../../../db/schema";
 import { eq } from "drizzle-orm";
-import { ForbiddenError } from "../../errors/forbiddenError";
-import { NotFoundError } from "../../errors/notFoundError";
+import { ForbiddenError } from "../../../errors/forbiddenError";
+import { NotFoundError } from "../../../errors/notFoundError";
 
 export const handler = async (
   event: APIGatewayProxyEventV2

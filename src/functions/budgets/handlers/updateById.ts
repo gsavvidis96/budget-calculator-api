@@ -1,13 +1,13 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
-import { authenticate } from "../../helpers/authenticate";
-import { handleError } from "../../helpers/handleError";
-import { db } from "../../db";
-import { budgets } from "../../db/schema";
+import { authenticate } from "../../../helpers/authenticate";
+import { handleError } from "../../../helpers/handleError";
+import { db } from "../../../db";
+import { budgets } from "../../../db/schema";
 import { and, eq } from "drizzle-orm";
-import { ForbiddenError } from "../../errors/forbiddenError";
-import { NotFoundError } from "../../errors/notFoundError";
+import { ForbiddenError } from "../../../errors/forbiddenError";
+import { NotFoundError } from "../../../errors/notFoundError";
 import { boolean, object, string } from "yup";
-import { validateBody } from "../../helpers/validateBody";
+import { validateBody } from "../../../helpers/validateBody";
 
 const bodySchema = object({
   title: string(),
