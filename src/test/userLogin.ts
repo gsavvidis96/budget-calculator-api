@@ -33,8 +33,6 @@ export const login = async () => {
 
     let idToken = await emailAndPasswordResponse.user.getIdToken(); // get id token
 
-    console.log(idToken);
-
     const result = (await loginHandler({
       body: JSON.stringify({ idToken }),
     } as APIGatewayProxyEventV2)) as APIGatewayProxyStructuredResultV2; // exchange idToken for custom token

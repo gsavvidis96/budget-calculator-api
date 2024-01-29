@@ -11,14 +11,14 @@ export const handler = async (
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> => {
   try {
-    const { budgetId } = event.pathParameters ?? {};
+    const budgetId = event?.pathParameters?.budgetId || "";
 
     const decodedUser = await authenticate(event.headers);
 
     const [budget] = await db
       .select()
       .from(budgets)
-      .where(eq(budgets.id, budgetId!));
+      .where(eq(budgets.id, budgetId));
 
     if (!budget) {
       throw new NotFoundError("This budget does not exist.");

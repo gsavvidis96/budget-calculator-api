@@ -3,7 +3,7 @@
   "scripts": {
     "start": "serverless offline start --stage development --reloadHandler",
     "migrations:generate": "drizzle-kit generate:pg",
-    "migrate": "dotenv -e .env.development -- ts-node ./src/db/migrate.ts",
+    "migrate:development": "dotenv -e .env.development -- ts-node ./src/db/migrate.ts",
     "login:development": "dotenv -e .env.development -- ts-node ./src/test/userLogin.ts",
     "test": "vitest"
   },
@@ -16,8 +16,8 @@
   },
   "devDependencies": {
     "@serverless/typescript": "^3.38.0",
-    "@types/aws-lambda": "^8.10.131",
-    "@types/node": "^20.11.0",
+    "@types/aws-lambda": "^8.10.132",
+    "@types/node": "^20.11.10",
     "@types/ws": "^8.5.10",
     "dotenv-cli": "^7.3.0",
     "drizzle-kit": "^0.20.13",
@@ -25,10 +25,10 @@
     "postgres": "^3.4.3",
     "serverless": "^3.38.0",
     "serverless-dotenv-plugin": "^6.0.0",
-    "serverless-esbuild": "^1.50.1",
+    "serverless-esbuild": "^1.50.2",
     "serverless-offline": "^13.3.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
-    "vitest": "^1.2.1"
+    "vitest": "^1.2.2"
   }
 }

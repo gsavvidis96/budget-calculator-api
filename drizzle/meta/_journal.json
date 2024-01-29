@@ -50,6 +50,20 @@
       "when": 1705138939155,
       "tag": "0006_unique_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1705998244371,
+      "tag": "0007_salty_adam_destine",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1706553013199,
+      "tag": "0008_absent_hardball",
+      "breakpoints": true
     }
   ]
 }
