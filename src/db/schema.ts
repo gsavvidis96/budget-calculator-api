@@ -24,7 +24,7 @@ export const budgets = pgTable("budgets", {
   id: varchar("id", { length: 50 })
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  title: text("title").unique().notNull(),
+  title: text("title").unique().notNull(), // CHECK CONSTRAINT: unique per user
   isPinned: boolean("is_pinned").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -41,7 +41,7 @@ export const budgetItems = pgTable("budget_items", {
   id: varchar("id", { length: 50 })
     .primaryKey()
     .default(sql`gen_random_uuid()`),
-  description: text("description").notNull(), // CHECK CONSTRAINT: unique description for a budget and type
+  description: text("description").notNull(), // CHECK CONSTRAINT: unique description per budget and type
   value: numeric("value").notNull(),
   // CHECK CONSTRAINT: format value with 2 decimal values, value>= 0, budget's balance should not be more than 10000000000000000
   type: budgetItemTypeEnum("type").notNull(),

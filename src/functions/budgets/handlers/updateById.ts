@@ -18,7 +18,7 @@ export const handler = async (
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> => {
   try {
-    const { budgetId } = event.pathParameters ?? {};
+    const budgetId = event?.pathParameters?.budgetId || "";
 
     const decodedUser = await authenticate(event.headers);
 
@@ -39,15 +39,15 @@ export const handler = async (
 
     // TODO: Drizzle-feat/updated_at not supported
 
-    const [deletedBudget] = await db
+    const [updatedBudget] = await db
       .update(budgets)
       .set({ title, isPinned, updatedAt: new Date() })
-      .where(and(eq(budgets.id, budgetId!), eq(budgets.userId, decodedUser.id)))
+      .where(and(eq(budgets.id, budgetId), eq(budgets.userId, decodedUser.id)))
       .returning();
 
     return {
       statusCode: 200,
-      body: JSON.stringify(deletedBudget),
+      body: JSON.stringify(updatedBudget),
     };
   } catch (e: any) {
     return handleError(e);

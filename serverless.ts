@@ -13,6 +13,7 @@ const serverlessConfiguration: AWS = {
     runtime: "nodejs20.x",
     timeout: 20,
     profile: process.env.AWS_PROFILE,
+    deploymentMethod: "direct",
   },
   functions: {
     ...authFunctions,

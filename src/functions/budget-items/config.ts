@@ -7,7 +7,18 @@ const functions: AWS["functions"] = {
       {
         httpApi: {
           method: "post",
-          path: "/budgets/{budgetId}/budget-item",
+          path: "/budgets/{budgetId}/budget-items",
+        },
+      },
+    ],
+  },
+  "budgetItems-updateById": {
+    handler: "src/functions/budget-items/handlers/updateById.handler",
+    events: [
+      {
+        httpApi: {
+          method: "patch",
+          path: "/budgets/{budgetId}/budget-items/{budgetItemId}",
         },
       },
     ],
