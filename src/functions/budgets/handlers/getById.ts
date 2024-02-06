@@ -1,30 +1,31 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
 import { authenticate } from "../../../helpers/authenticate";
 import { handleError } from "../../../helpers/handleError";
-import { db } from "../../../db";
-import { budgets } from "../../../db/schema";
-import { eq } from "drizzle-orm";
 import { ForbiddenError } from "../../../errors/forbiddenError";
 import { NotFoundError } from "../../../errors/notFoundError";
+import { getDb } from "../../../db";
 
 export const handler = async (
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> => {
+  const { db, pool } = getDb();
+
   try {
     const budgetId = event?.pathParameters?.budgetId || "";
 
     const decodedUser = await authenticate(event.headers);
 
-    const [budget] = await db
-      .select()
-      .from(budgets)
-      .where(eq(budgets.id, budgetId));
+    const budget = await db
+      .selectFrom("budgets")
+      .where("id", "=", budgetId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!budget) {
       throw new NotFoundError("This budget does not exist.");
     }
 
-    if (budget.userId !== decodedUser.id) {
+    if (budget.user_id !== decodedUser.id) {
       throw new ForbiddenError();
     }
 
@@ -34,5 +35,7 @@ export const handler = async (
     };
   } catch (e: any) {
     return handleError(e);
+  } finally {
+    pool.end();
   }
 };

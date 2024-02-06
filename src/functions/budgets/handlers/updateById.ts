@@ -1,13 +1,11 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
 import { authenticate } from "../../../helpers/authenticate";
 import { handleError } from "../../../helpers/handleError";
-import { db } from "../../../db";
-import { budgets } from "../../../db/schema";
-import { and, eq } from "drizzle-orm";
 import { ForbiddenError } from "../../../errors/forbiddenError";
 import { NotFoundError } from "../../../errors/notFoundError";
 import { boolean, object, string } from "yup";
 import { validateBody } from "../../../helpers/validateBody";
+import { getDb } from "../../../db";
 
 const bodySchema = object({
   title: string(),
@@ -17,33 +15,41 @@ const bodySchema = object({
 export const handler = async (
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> => {
+  const { db, pool } = getDb();
+
   try {
     const budgetId = event?.pathParameters?.budgetId || "";
-
     const decodedUser = await authenticate(event.headers);
-
     const { title, isPinned } = await validateBody(bodySchema, event.body);
 
-    const [budget] = await db
-      .select()
-      .from(budgets)
-      .where(eq(budgets.id, budgetId!));
+    const budget = await db
+      .selectFrom("budgets")
+      .where("id", "=", budgetId)
+      .selectAll()
+      .executeTakeFirst();
 
     if (!budget) {
       throw new NotFoundError("This budget does not exist.");
     }
 
-    if (budget.userId !== decodedUser.id) {
+    if (budget.user_id !== decodedUser.id) {
       throw new ForbiddenError();
     }
 
-    // TODO: Drizzle-feat/updated_at not supported
-
-    const [updatedBudget] = await db
-      .update(budgets)
-      .set({ title, isPinned, updatedAt: new Date() })
-      .where(and(eq(budgets.id, budgetId), eq(budgets.userId, decodedUser.id)))
-      .returning();
+    const updatedBudget = await db
+      .updateTable("budgets")
+      .set({
+        title,
+        is_pinned: isPinned,
+      })
+      .where((eb) =>
+        eb.and({
+          id: budgetId,
+          user_id: decodedUser.id,
+        })
+      )
+      .returningAll()
+      .executeTakeFirst();
 
     return {
       statusCode: 200,
@@ -51,5 +57,7 @@ export const handler = async (
     };
   } catch (e: any) {
     return handleError(e);
+  } finally {
+    pool.end();
   }
 };

@@ -1,10 +1,9 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
-import { db } from "../../../db";
-import { budgets } from "../../../db/schema";
 import { handleError } from "../../../helpers/handleError";
 import { authenticate } from "../../../helpers/authenticate";
 import { object, string } from "yup";
 import { validateBody } from "../../../helpers/validateBody";
+import { getDb } from "../../../db";
 
 const bodySchema = object({
   title: string().required(),
@@ -13,15 +12,21 @@ const bodySchema = object({
 export const handler = async (
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> => {
+  const { db, pool } = getDb();
+
   try {
     const decodedUser = await authenticate(event.headers);
 
     const { title } = await validateBody(bodySchema, event.body);
 
-    const [budget] = await db
-      .insert(budgets)
-      .values({ title, userId: decodedUser.id })
-      .returning();
+    const budget = await db
+      .insertInto("budgets")
+      .values({
+        title,
+        user_id: decodedUser.id,
+      })
+      .returningAll()
+      .executeTakeFirst();
 
     return {
       statusCode: 200,
@@ -29,5 +34,7 @@ export const handler = async (
     };
   } catch (e: any) {
     return handleError(e);
+  } finally {
+    pool.end();
   }
 };

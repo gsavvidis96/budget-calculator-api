@@ -1,1 +1,0 @@
-ALTER TABLE "budgets" ADD COLUMN "updated_at" timestamp;

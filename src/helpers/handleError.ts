@@ -1,5 +1,4 @@
 import { CustomError, SerializedError } from "../errors/customError";
-import { NeonDbError } from "@neondatabase/serverless";
 
 export const handleError = (error: any) => {
   if (error instanceof CustomError) {
@@ -9,24 +8,22 @@ export const handleError = (error: any) => {
     };
   }
 
-  // TODO: Drizzle-feat/provide proper field information on unique errors
-  if (error instanceof NeonDbError) {
-    if (error.code === "23505") {
-      const detailMatch = error.message.match(
-        /Key \(([^)]+)\)=\([^)]+\) already exists\./
-      );
-      const keyName = detailMatch ? detailMatch[1] : "unknown";
+  // TODO: proper error message
+  if (error.code === "23505") {
+    const detailMatch = error.detail.match(
+      /Key \(([^)]+)\)=\([^)]+\) already exists\./
+    );
+    const keyName = detailMatch ? detailMatch[1] : "unknown";
 
-      const serializedError: SerializedError = {
-        message: `The value for '${keyName}' already exists. Please choose a different value.`,
-        field: keyName,
-      };
+    const serializedError: SerializedError = {
+      message: `The value for '${keyName}' already exists. Please choose a different value.`,
+      field: keyName,
+    };
 
-      return {
-        statusCode: 400,
-        body: JSON.stringify(serializedError),
-      };
-    }
+    return {
+      statusCode: 400,
+      body: JSON.stringify(serializedError),
+    };
   }
 
   console.error(error);

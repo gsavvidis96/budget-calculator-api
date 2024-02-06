@@ -1,1 +1,0 @@
-ALTER TABLE "budget_items" ALTER COLUMN "type" SET NOT NULL;

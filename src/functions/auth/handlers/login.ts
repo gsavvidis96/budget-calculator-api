@@ -1,11 +1,10 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
 import firebaseAuth from "../../../firebaseAuth";
-import { db } from "../../../db";
-import { users } from "../../../db/schema";
 import { object, string } from "yup";
 import { validateBody } from "../../../helpers/validateBody";
 import { handleError } from "../../../helpers/handleError";
 import { NotAuthorizedError } from "../../../errors/notAuthorizedError";
+import { getDb } from "../../../db";
 
 const bodySchema = object({
   idToken: string().required(),
@@ -14,6 +13,8 @@ const bodySchema = object({
 export const handler = async (
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> => {
+  const { db, pool } = getDb();
+
   try {
     const { idToken } = await validateBody(bodySchema, event.body);
 
@@ -27,9 +28,13 @@ export const handler = async (
 
     // upsert user in database with the firebaseUser.uid
     await db
-      .insert(users)
-      .values({ id: firebaseUser.uid, email: firebaseUser.email! })
-      .onConflictDoNothing({ target: users.id });
+      .insertInto("users")
+      .values({
+        id: firebaseUser.uid,
+        email: firebaseUser.email!,
+      })
+      .onConflict((oc) => oc.doNothing())
+      .execute();
 
     const additionalClaims = {
       userVerified: true,
@@ -49,5 +54,7 @@ export const handler = async (
     };
   } catch (e) {
     return handleError(e);
+  } finally {
+    await pool.end();
   }
 };

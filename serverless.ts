@@ -1,7 +1,6 @@
 import type { AWS } from "@serverless/typescript";
 import authFunctions from "./src/functions/auth/config";
 import budgetFunctions from "./src/functions/budgets/config";
-import budgetItemFunctions from "./src/functions/budget-items/config";
 
 const serverlessConfiguration: AWS = {
   service: "budget-calculator-api",
@@ -18,7 +17,6 @@ const serverlessConfiguration: AWS = {
   functions: {
     ...authFunctions,
     ...budgetFunctions,
-    ...budgetItemFunctions,
   },
   plugins: [
     "serverless-dotenv-plugin",

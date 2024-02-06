@@ -1,4 +1,0 @@
-- add tests
-- add swagger
-- add standalone migration tool along with drizzle (support check constraint, updated_at and more)
-- add ci in production
