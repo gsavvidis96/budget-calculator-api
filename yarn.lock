@@ -832,40 +832,40 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@dbmate/darwin-arm64@2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@dbmate/darwin-arm64/-/darwin-arm64-2.11.0.tgz#41551297f5f7bb57bc5a9e22f02903d47ea9fe3a"
-  integrity sha512-jykV1B358pBVCujE48hmTZYEpge/qGYZyNjwj3cASsRoiJBwoLSUmWnI7IVbE0G0qJDtQkj6LUUDdxfh+K2bKg==
+"@dbmate/darwin-arm64@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@dbmate/darwin-arm64/-/darwin-arm64-2.12.0.tgz#14196ca066e0dd3f7012adbaecf516bb990ca8a1"
+  integrity sha512-gmvq0nycXdmeP98hqDmq5uORNvzx22+PCuolHUvAdkDhMNqEspOt7xoepJTLnnGaeaQ83uxcANUcAA4S44uviA==
 
-"@dbmate/darwin-x64@2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@dbmate/darwin-x64/-/darwin-x64-2.11.0.tgz#620d1d679639a605c2890d5b47ad48a24091bd87"
-  integrity sha512-SicdUBLeD8Ohvjpn6Yr4vtkslYc4LTqDKLJ3zl21lM2W49UDbYvMi6Oe1KYmQscMFL4Ns8L1vTOUp9zYvt4hNQ==
+"@dbmate/darwin-x64@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@dbmate/darwin-x64/-/darwin-x64-2.12.0.tgz#be02b92d4d9a55b3168196bdd495fdc40a231aa8"
+  integrity sha512-KwETT+910dQ/gg4q6y8H41RupNWG9en8lnx5uZ7upwbEPN39/cQ7zWBRXBR08a5fVRaIDQiSTyQpVrJ3b6b43Q==
 
-"@dbmate/linux-arm64@2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@dbmate/linux-arm64/-/linux-arm64-2.11.0.tgz#6da526ad484991001563cb13be44e34bd073bb1a"
-  integrity sha512-5QgN3m17/MiMgBynOk90aocVLGMmL4lYUNROiavD15IQMfjAA3w0wCbEfuQTbcH3D6kmqTbTCpRWiizLsXSpFA==
+"@dbmate/linux-arm64@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@dbmate/linux-arm64/-/linux-arm64-2.12.0.tgz#43f533e76a3bd7bbd97d9cfcb30bb40560b2015c"
+  integrity sha512-j9MRpwGOsyv4ZVnW8zK4jM6pm+wGoTx0Gym8y6fBXeTKfQr8BGHxHcnId3z8K+1sw4UHrI5Z2Oaj3YMwL+GbwQ==
 
-"@dbmate/linux-arm@2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@dbmate/linux-arm/-/linux-arm-2.11.0.tgz#c77e4f8f4aa71b49918a3978887c4a4b90d71684"
-  integrity sha512-AMqfRqtSzkpLsXIGt+jNuDOfA1y4J8nCyqJM5oi/jQ9PsQDucXjQDwVj/Q6ETx265a+pIq7E4++X8Int7Z5xrA==
+"@dbmate/linux-arm@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@dbmate/linux-arm/-/linux-arm-2.12.0.tgz#ba9acc2cd084c1d3304a344f1dba1ebd5c5031b0"
+  integrity sha512-f4wL2lkoOh+qGtisaVw7zYDSDJ+g0D8wMsZeg07f4DBkrBAogJ87CSr2bvAKg+IioaNpGIUYSwYT3O5q495RuQ==
 
-"@dbmate/linux-ia32@2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@dbmate/linux-ia32/-/linux-ia32-2.11.0.tgz#d21b64e562dc56cbca1611f13ecdeb21cab32c22"
-  integrity sha512-+/C2iMp8IjJ2PMkWbNapCvtMhRgKcCh1qzNBnQE1yKSmnsbHmrWCNLYAH4CBIKphHYfgJfCO/jqEeFnpfWzcWw==
+"@dbmate/linux-ia32@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@dbmate/linux-ia32/-/linux-ia32-2.12.0.tgz#4dc08105416d0af38e90f9da5b412d6242320798"
+  integrity sha512-XEDxYd7YtSP45STSrO8ldq++pLnNCMd9/O7fqXiGya/2J4mJwlIShRfRk1UNsiK3wT0G622tcOzPSaCcaGlcSA==
 
-"@dbmate/linux-x64@2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@dbmate/linux-x64/-/linux-x64-2.11.0.tgz#b81f5ac8621c2688ed9c40f36e230464ad23c4c5"
-  integrity sha512-nZHa6mj04grC6VhRLTno95hcgewoBDwqwCgFtoRwwqd5ViOTaFLeO69VpguhsJbGdpTFIdaQli5cyb1Rqmkj/w==
+"@dbmate/linux-x64@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@dbmate/linux-x64/-/linux-x64-2.12.0.tgz#33bc078ba3f0d317ec9ae23f0b3f00236ed755a6"
+  integrity sha512-1dSxN8Z+e1u220AwKBQ9B4YSORyJa2lgNN2MnZJQZSJJItPZSPfD/VXCSjx3A1AnRxYi0uKX89RNPXhMP3V2Hg==
 
-"@dbmate/win32-x64@2.11.0":
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/@dbmate/win32-x64/-/win32-x64-2.11.0.tgz#4415923b94b4efaa899285342cd0f8ac72240e51"
-  integrity sha512-1Hmm23BeLH5wx6ofgfX5R++KSYpG1ri7v/z4K1euG9kj7F0t77mBgZ1ZfQy8K6kUrx9JOb3QvONLd8QR3iKR0g==
+"@dbmate/win32-x64@2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@dbmate/win32-x64/-/win32-x64-2.12.0.tgz#68064afa7d7c65da68f419ea010cd8cda1c27fd8"
+  integrity sha512-wirLct1LIFjAyuQbm2bj72oFOwr4ds6+dZ51rsV4Xz016dOBQorBKcRQZb4HfjH2CUxvjXufxxgzqdLk72TTMw==
 
 "@esbuild/aix-ppc64@0.19.10":
   version "0.19.10"
@@ -1781,10 +1781,10 @@
   resolved "https://registry.yarnpkg.com/@kwsites/promise-deferred/-/promise-deferred-1.1.1.tgz#8ace5259254426ccef57f3175bc64ed7095ed919"
   integrity sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==
 
-"@neondatabase/serverless@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@neondatabase/serverless/-/serverless-0.7.2.tgz#4deeda842df154e061b8e798dec5d03d1310fa92"
-  integrity sha512-wU3WA2uTyNO7wjPs3Mg0G01jztAxUxzd9/mskMmtPwPTjf7JKWi9AW5/puOGXLxmZ9PVgRFeBVRVYq5nBPhsCg==
+"@neondatabase/serverless@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@neondatabase/serverless/-/serverless-0.8.1.tgz#3fbfbf184af9145daf29a1048871c82877d1ee0d"
+  integrity sha512-nxZfTLbGqvDrw0W9WnQxzoPn4KC6SLjkvK4grdf6eWVMQSc24X+8udz9inZWOGu8f0O3wJAq586fCZ32r22lwg==
   dependencies:
     "@types/pg" "8.6.6"
 
@@ -2994,10 +2994,10 @@
   dependencies:
     undici-types "~5.26.4"
 
-"@types/node@^20.11.16":
-  version "20.11.16"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.16.tgz#4411f79411514eb8e2926f036c86c9f0e4ec6708"
-  integrity sha512-gKb0enTmRCzXSSUJDq6/sPcqrfCv2mkkG6Jt/clpn5eiCbKTY+SgZUxo+p8ZKMof5dCp9vHQUAB7wOUTod22wQ==
+"@types/node@^20.11.17":
+  version "20.11.17"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.17.tgz#cdd642d0e62ef3a861f88ddbc2b61e32578a9292"
+  integrity sha512-QmgQZGWu1Yw9TDyAP9ZzpFJKynYNeOvwMJmaxABfieQoVoiVOS6MN1WSpqpRcbeA5+RW82kraAVxCCJg+780Qw==
   dependencies:
     undici-types "~5.26.4"
 
@@ -3907,18 +3907,18 @@ dayjs@^1.11.8:
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.10.tgz#68acea85317a6e164457d6d6947564029a6a16a0"
   integrity sha512-vjAczensTgRcqDERK0SR2XMwsF/tSvnvlv6VcF2GIhg6Sx4yOIt/irsr1RDJsKiIyBzJDpCoXiWWq28MqH2cnQ==
 
-dbmate@^2.11.0:
-  version "2.11.0"
-  resolved "https://registry.yarnpkg.com/dbmate/-/dbmate-2.11.0.tgz#6406e4d85307b56b46235a9db2e3af1fe438cf24"
-  integrity sha512-KVSyDdJn31pFfxHUfba7Kl0HohSr1RSQ9hPWVKCT+rVWEXdxRQozZ9mZvYoONU8UQppVF6zGuHvdF/Gs/gaOgA==
+dbmate@^2.12.0:
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/dbmate/-/dbmate-2.12.0.tgz#9a7404e6a708d374186a7c79d7b0249988449922"
+  integrity sha512-tfbVxBKb/0Ch+dCH6QV2VmfZZggIOO5E6AgbCuYhLkkP/Z5vZ17P6dkvdOfxmSk6USNvX0eRmUalVe9fO5SdRA==
   optionalDependencies:
-    "@dbmate/darwin-arm64" "2.11.0"
-    "@dbmate/darwin-x64" "2.11.0"
-    "@dbmate/linux-arm" "2.11.0"
-    "@dbmate/linux-arm64" "2.11.0"
-    "@dbmate/linux-ia32" "2.11.0"
-    "@dbmate/linux-x64" "2.11.0"
-    "@dbmate/win32-x64" "2.11.0"
+    "@dbmate/darwin-arm64" "2.12.0"
+    "@dbmate/darwin-x64" "2.12.0"
+    "@dbmate/linux-arm" "2.12.0"
+    "@dbmate/linux-arm64" "2.12.0"
+    "@dbmate/linux-ia32" "2.12.0"
+    "@dbmate/linux-x64" "2.12.0"
+    "@dbmate/win32-x64" "2.12.0"
 
 debug@4, debug@^4.1.1, debug@^4.3.3, debug@^4.3.4:
   version "4.3.4"
