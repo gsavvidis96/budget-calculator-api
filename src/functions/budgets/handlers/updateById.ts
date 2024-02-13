@@ -3,13 +3,25 @@ import { authenticate } from "../../../helpers/authenticate";
 import { handleError } from "../../../helpers/handleError";
 import { ForbiddenError } from "../../../errors/forbiddenError";
 import { NotFoundError } from "../../../errors/notFoundError";
-import { boolean, object, string } from "yup";
+import { ValidationError, boolean, object, string } from "yup";
 import { validateBody } from "../../../helpers/validateBody";
 import { getDb } from "../../../db";
+import { areAllValuesUndefined } from "../../../helpers/checkAllValuesUndefined";
 
 const bodySchema = object({
   title: string(),
-  isPinned: boolean(),
+  is_pinned: boolean(),
+}).test((fields, context) => {
+  if (areAllValuesUndefined(fields))
+    return new ValidationError(
+      `Please provide at least one of the following: ${Object.keys(
+        context.schema.fields
+      ).join(", ")}`,
+      "",
+      "*"
+    );
+
+  return true;
 });
 
 export const handler = async (
@@ -20,7 +32,7 @@ export const handler = async (
   try {
     const budgetId = event?.pathParameters?.budgetId || "";
     const decodedUser = await authenticate(event.headers);
-    const { title, isPinned } = await validateBody(bodySchema, event.body);
+    const { title, is_pinned } = await validateBody(bodySchema, event.body);
 
     const budget = await db
       .selectFrom("budgets")
@@ -40,7 +52,7 @@ export const handler = async (
       .updateTable("budgets")
       .set({
         title,
-        is_pinned: isPinned,
+        is_pinned,
       })
       .where((eb) =>
         eb.and({
