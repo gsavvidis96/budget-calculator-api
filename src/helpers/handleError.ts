@@ -8,7 +8,6 @@ export const handleError = (error: any) => {
     };
   }
 
-  // TODO: proper error message
   if (error.code === "23505") {
     const detailMatch = error.detail.match(
       /Key \(([^)]+)\)=\([^)]+\) already exists\./

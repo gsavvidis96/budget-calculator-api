@@ -1,0 +1,9 @@
+budgets-getAll
+    pagination
+    sortBy
+        is_pinned
+        created_at
+        updated_at
+        balance
+proper error messages on constraints errors
+budget_items value column custom constraint maximum value (parent budget's balance)

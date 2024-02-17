@@ -16,7 +16,7 @@ export interface UsersTable {
 export interface BudgetsTable {
   id: ColumnType<string, never, never>;
   title: string;
-  is_pinned: boolean | null;
+  is_pinned: ColumnType<boolean, boolean | null, boolean | null>;
   user_id: ColumnType<string, string, never>;
   created_at: ColumnType<string, never, never>;
   updated_at: ColumnType<string, never, never>;
