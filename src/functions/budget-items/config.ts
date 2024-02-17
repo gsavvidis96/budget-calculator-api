@@ -23,6 +23,17 @@ const functions: AWS["functions"] = {
       },
     ],
   },
+  "budget-items-deleteById": {
+    handler: "src/functions/budget-items/handlers/deleteById.handler",
+    events: [
+      {
+        httpApi: {
+          method: "delete",
+          path: "/budgets/{budgetId}/budget-items/{budgetItemId}",
+        },
+      },
+    ],
+  },
 };
 
 export default functions;
