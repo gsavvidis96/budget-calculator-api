@@ -1,5 +1,4 @@
 budgets-getAll
-    pagination
     sortBy
         is_pinned
         created_at
