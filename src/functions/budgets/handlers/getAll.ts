@@ -4,6 +4,9 @@ import { handleError } from "../../../helpers/handleError";
 import { getDb } from "../../../db";
 import { sql } from "kysely";
 
+const SORT_BY_VALUES = ["created_at", "updated_at", "balance"];
+const SORT_BY_DIRECTION_VALUES = ["asc", "desc"] as const;
+
 export const handler = async (
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> => {
@@ -17,6 +20,13 @@ export const handler = async (
     const offset = !isNaN(Number(event?.queryStringParameters?.offset))
       ? Number(event?.queryStringParameters?.offset)
       : 0;
+    const sort = event?.queryStringParameters?.sort || "";
+    const [sortBy, sortByDirection] = sort.split(":") as [
+      string,
+      "asc" | "desc"
+    ];
+
+    const { ref } = db.dynamic;
 
     const response = await db.transaction().execute(async (transaction) => {
       const [budgets, countResponse] = await Promise.all([
@@ -39,6 +49,15 @@ export const handler = async (
           )
           .limit(limit)
           .offset(offset)
+          .orderBy("is_pinned desc")
+          .$if(SORT_BY_VALUES.includes(sortBy), (qb) =>
+            qb.orderBy(
+              ref(sortBy),
+              SORT_BY_DIRECTION_VALUES.includes(sortByDirection)
+                ? sortByDirection
+                : "asc"
+            )
+          )
           .execute(),
         transaction
           .selectFrom("budgets")
