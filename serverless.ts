@@ -19,6 +19,17 @@ const serverlessConfiguration: AWS = {
     ...authFunctions,
     ...budgetsFunctions,
     ...budgetItemsFunctions,
+    swaggerUi: {
+      handler: "src/functions/swaggerUi.handler",
+      events: [
+        {
+          httpApi: {
+            method: "get",
+            path: "/docs",
+          },
+        },
+      ],
+    },
   },
   plugins: [
     "serverless-dotenv-plugin",
