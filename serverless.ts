@@ -14,6 +14,9 @@ const serverlessConfiguration: AWS = {
     timeout: 20,
     profile: process.env.AWS_PROFILE,
     deploymentMethod: "direct",
+    httpApi: {
+      cors: true,
+    },
   },
   functions: {
     ...authFunctions,

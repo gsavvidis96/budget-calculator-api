@@ -1,7 +1,7 @@
 {
   "name": "budget-calculator-api",
   "scripts": {
-    "start": "serverless offline start --stage development --reloadHandler",
+    "start": "serverless offline start --stage development --reloadHandler --httpPort 3001",
     "migrate:development": "dbmate --env-file '.env.development' migrate",
     "rollback:development": "dbmate --env-file '.env.development' rollback",
     "login:development": "dotenv -e .env.development -- ts-node ./src/test/userLogin.ts",

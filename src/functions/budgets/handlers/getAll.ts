@@ -25,6 +25,11 @@ export const handler = async (
       string,
       "asc" | "desc"
     ];
+    let search = event?.queryStringParameters?.search || "";
+
+    if (Boolean(search)) {
+      search = `%${search.toLowerCase()}%`;
+    }
 
     const { ref } = db.dynamic;
 
@@ -33,6 +38,7 @@ export const handler = async (
         transaction
           .selectFrom("budgets")
           .where("user_id", "=", decodedUser.id)
+          .$if(Boolean(search), (qb) => qb.where("title", "like", search))
           .selectAll()
           .select((eb) =>
             eb
