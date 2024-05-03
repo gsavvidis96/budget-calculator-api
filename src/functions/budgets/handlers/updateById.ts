@@ -9,7 +9,7 @@ import { getDb } from "../../../db";
 import { areAllValuesUndefined } from "../../../helpers/checkAllValuesUndefined";
 
 const bodySchema = object({
-  title: string(),
+  title: string().min(1),
   is_pinned: boolean(),
 }).test((fields, context) => {
   if (areAllValuesUndefined(fields))

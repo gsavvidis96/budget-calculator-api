@@ -11,7 +11,7 @@ import { jsonArrayFrom } from "kysely/helpers/postgres";
 import { areAllValuesUndefined } from "../../../helpers/checkAllValuesUndefined";
 
 const bodySchema = object({
-  description: string(),
+  description: string().min(0),
   value: number().min(0),
   type: mixed<BudgetItem["type"]>().oneOf(BUDGET_ITEMS_TYPES),
 }).test((fields, context) => {

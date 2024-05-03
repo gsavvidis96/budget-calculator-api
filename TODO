@@ -1,4 +1,3 @@
 budget_items value column custom constraint maximum value (parent budget's balance)
 normalize title to be lowercase
 delete database entry on firebase console user delete
-budgets text search
