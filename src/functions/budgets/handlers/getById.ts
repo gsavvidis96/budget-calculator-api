@@ -18,61 +18,76 @@ export const handler = async (
     const decodedUser = await authenticate(event.headers);
 
     const budget = await db
-      .selectFrom("budgets")
-      .where("id", "=", budgetId)
-      .selectAll()
-      .select((eb) => [
-        // EXPENSE_ITEMS
-        jsonArrayFrom(
-          eb
-            .selectFrom("budget_items")
-            .selectAll()
-            .whereRef("budget_items.budget_id", "=", "budgets.id")
-            .where("budget_items.type", "=", "EXPENSES")
-        ).as("expense_items"),
-        // INCOME ITEMS
-        jsonArrayFrom(
-          eb
-            .selectFrom("budget_items")
-            .selectAll()
-            .whereRef("budget_items.budget_id", "=", "budgets.id")
-            .where("budget_items.type", "=", "INCOME")
-        ).as("income_items"),
-        // TOTAL_EXPENSES
-        eb
+      // calculate filtered budget items for given budgetId
+      .with("budget_items_filtered", (db) =>
+        db
           .selectFrom("budget_items")
-          .whereRef("budget_items.budget_id", "=", "budgets.id")
-          .where("budget_items.type", "=", "EXPENSES")
-          .select(({ fn }) =>
-            fn
-              .coalesce(fn.sum<number>("budget_items.value"), sql<number>`0`)
-              .as("total_expenses")
-          )
-          .as("total_expenses"),
-        // TOTAL_INCOME
-        eb
-          .selectFrom("budget_items")
-          .whereRef("budget_items.budget_id", "=", "budgets.id")
-          .where("budget_items.type", "=", "INCOME")
-          .select(({ fn }) =>
-            fn
-              .coalesce(fn.sum<number>("budget_items.value"), sql<number>`0`)
-              .as("total_income")
-          )
-          .as("total_income"),
-        // BALANCE
-        eb
-          .selectFrom("budget_items")
-          .whereRef("budget_items.budget_id", "=", "budgets.id")
+          .where("budget_id", "=", budgetId)
+          .selectAll()
+      )
+      // calculate total income and total expenses
+      .with("totals", (db) =>
+        db
+          .selectFrom("budget_items_filtered")
+          .select(() => [
+            sql`SUM(CASE WHEN "type" = 'INCOME' THEN "value" ELSE 0 END)`.as(
+              "total_income"
+            ),
+            sql`SUM(CASE WHEN "type" = 'EXPENSES' THEN "value" ELSE 0 END)`.as(
+              "total_expenses"
+            ),
+          ])
+      )
+      // calculate expense items
+      .with("expense_items", (db) =>
+        db
+          .selectFrom(["budget_items_filtered", "totals"])
+          .where("type", "=", "EXPENSES")
+          .selectAll()
           .select(() =>
             sql`
-          COALESCE(SUM(CASE WHEN "type" = 'INCOME' THEN "value" ELSE 0 END), 0) -
-          COALESCE(SUM(CASE WHEN "type" = 'EXPENSES' THEN "value" ELSE 0 END), 0)`.as(
-              "balance"
-            )
+          ROUND((value / NULLIF(totals.total_income, 0)) * 100, 2)
+          `.as("expense_percentage")
           )
-          .as("balance"),
+      )
+      // calculate income items
+      .with("income_items", (db) =>
+        db
+          .selectFrom("budget_items_filtered")
+          .where("type", "=", "INCOME")
+          .selectAll()
+      )
+      .selectFrom(["totals", "budgets"])
+      .where("budgets.id", "=", budgetId)
+      .select((eb) => [
+        eb.fn
+          .coalesce("totals.total_expenses", sql<number>`0`)
+          .as("total_expenses"),
+        eb.fn
+          .coalesce("totals.total_income", sql<number>`0`)
+          .as("total_income"),
+        sql`COALESCE(totals.total_income, 0) - COALESCE(totals.total_expenses, 0)`.as(
+          "balance"
+        ),
+        sql`COALESCE(ROUND(
+          (COALESCE(totals.total_expenses, 0) / NULLIF(COALESCE(totals.total_income, 0), 0)) * 100,
+          2), 0)`.as("expenses_percentage"),
+        jsonArrayFrom(
+          eb
+            .selectFrom("expense_items")
+            .selectAll()
+            .whereRef("expense_items.budget_id", "=", "budgets.id")
+            .orderBy("created_at")
+        ).as("expense_items"),
+        jsonArrayFrom(
+          eb
+            .selectFrom("income_items")
+            .selectAll()
+            .whereRef("income_items.budget_id", "=", "budgets.id")
+            .orderBy("created_at")
+        ).as("income_items"),
       ])
+      .selectAll("budgets")
       .executeTakeFirst();
 
     if (!budget) {
