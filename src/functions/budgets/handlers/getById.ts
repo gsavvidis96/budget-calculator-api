@@ -46,7 +46,7 @@ export const handler = async (
           .selectAll()
           .select(() =>
             sql`
-          ROUND((value / NULLIF(totals.total_income, 0)) * 100, 2)
+          COALESCE(ROUND((value / NULLIF(totals.total_income, 0)) * 100, 2), 0)
           `.as("expense_percentage")
           )
       )
