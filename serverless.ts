@@ -11,7 +11,6 @@ const serverlessConfiguration: AWS = {
     name: "aws",
     region: "eu-south-1",
     runtime: "nodejs20.x",
-    timeout: 20,
     profile: process.env.AWS_PROFILE,
     deploymentMethod: "direct",
     httpApi: {
@@ -23,7 +22,7 @@ const serverlessConfiguration: AWS = {
     ...budgetsFunctions,
     ...budgetItemsFunctions,
     swaggerUi: {
-      handler: "src/functions/swaggerUi.handler",
+      handler: "dist/functions/swaggerUi.handler",
       events: [
         {
           httpApi: {
@@ -34,11 +33,7 @@ const serverlessConfiguration: AWS = {
       ],
     },
   },
-  plugins: [
-    "serverless-dotenv-plugin",
-    "serverless-esbuild",
-    "serverless-offline",
-  ],
+  plugins: ["serverless-dotenv-plugin", "serverless-offline"],
 };
 
 module.exports = serverlessConfiguration;

@@ -2,7 +2,7 @@ import type { AWS } from "@serverless/typescript";
 
 const functions: AWS["functions"] = {
   "auth-login": {
-    handler: "src/functions/auth/handlers/login.handler",
+    handler: "dist/functions/auth/handlers/login.handler",
     events: [
       {
         httpApi: {
@@ -13,7 +13,7 @@ const functions: AWS["functions"] = {
     ],
   },
   "auth-currentUser": {
-    handler: "src/functions/auth/handlers/currentUser.handler",
+    handler: "dist/functions/auth/handlers/currentUser.handler",
     events: [
       {
         httpApi: {

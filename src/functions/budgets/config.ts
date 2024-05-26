@@ -2,7 +2,7 @@ import type { AWS } from "@serverless/typescript";
 
 const functions: AWS["functions"] = {
   "budgets-getAll": {
-    handler: "src/functions/budgets/handlers/getAll.handler",
+    handler: "dist/functions/budgets/handlers/getAll.handler",
     events: [
       {
         httpApi: {
@@ -13,7 +13,7 @@ const functions: AWS["functions"] = {
     ],
   },
   "budgets-create": {
-    handler: "src/functions/budgets/handlers/create.handler",
+    handler: "dist/functions/budgets/handlers/create.handler",
     events: [
       {
         httpApi: {
@@ -24,7 +24,7 @@ const functions: AWS["functions"] = {
     ],
   },
   "budgets-deleteById": {
-    handler: "src/functions/budgets/handlers/deleteById.handler",
+    handler: "dist/functions/budgets/handlers/deleteById.handler",
     events: [
       {
         httpApi: {
@@ -35,7 +35,7 @@ const functions: AWS["functions"] = {
     ],
   },
   "budgets-getById": {
-    handler: "src/functions/budgets/handlers/getById.handler",
+    handler: "dist/functions/budgets/handlers/getById.handler",
     events: [
       {
         httpApi: {
@@ -46,7 +46,7 @@ const functions: AWS["functions"] = {
     ],
   },
   "budgets-updateById": {
-    handler: "src/functions/budgets/handlers/updateById.handler",
+    handler: "dist/functions/budgets/handlers/updateById.handler",
     events: [
       {
         httpApi: {

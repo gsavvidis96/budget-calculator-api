@@ -1,9 +1,9 @@
 {
   "name": "budget-calculator-api",
   "scripts": {
-    "start": "serverless offline start --stage development --reloadHandler --httpPort 3001",
-    "migrate:development": "dbmate --env-file '.env.development' migrate",
-    "rollback:development": "dbmate --env-file '.env.development' rollback",
+    "start": "concurrently \"npx tsc --watch\" \"serverless offline start --stage development --reloadHandler --httpPort 3001\"",
+    "migrate:development": "dbmate --env-file \".env.development\" migrate",
+    "rollback:development": "dbmate --env-file \".env.development\" rollback",
     "login:development": "dotenv -e .env.development -- ts-node ./src/test/userLogin.ts",
     "test": "vitest"
   },
@@ -21,15 +21,14 @@
     "@types/aws-lambda": "^8.10.133",
     "@types/node": "^20.11.17",
     "@types/ws": "^8.5.10",
+    "concurrently": "^8.2.2",
     "dbmate": "^2.12.0",
     "dotenv-cli": "^7.3.0",
     "firebase": "^10.8.0",
     "openapi-types": "^12.1.3",
-    "postgres": "^3.4.3",
     "serverless": "^3.38.0",
     "serverless-dotenv-plugin": "^6.0.0",
-    "serverless-esbuild": "^1.51.0",
-    "serverless-offline": "^13.3.3",
+    "serverless-offline": "^13.6.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "vitest": "^1.2.2"

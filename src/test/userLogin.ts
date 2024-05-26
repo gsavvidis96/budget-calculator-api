@@ -3,7 +3,6 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   signInWithCustomToken,
-  connectAuthEmulator,
 } from "firebase/auth";
 import { handler as loginHandler } from "../functions/auth/handlers/login";
 import {
@@ -16,12 +15,6 @@ const firebaseApp = initializeApp({
 });
 
 const auth = getAuth(firebaseApp);
-
-if (process.env.FIREBASE_AUTH_EMULATOR_HOST)
-  connectAuthEmulator(
-    auth,
-    `http://${process.env.FIREBASE_AUTH_EMULATOR_HOST}`
-  );
 
 export const login = async () => {
   try {
