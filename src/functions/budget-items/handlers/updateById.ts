@@ -7,12 +7,12 @@ import { validateBody } from "../../../helpers/validateBody";
 import { getDb } from "../../../db";
 import { NotFoundError } from "../../../errors/notFoundError";
 import { ForbiddenError } from "../../../errors/forbiddenError";
-import { jsonArrayFrom } from "kysely/helpers/postgres";
+import { jsonObjectFrom } from "kysely/helpers/postgres";
 import { areAllValuesUndefined } from "../../../helpers/checkAllValuesUndefined";
 
 const bodySchema = object({
   description: string().min(0),
-  value: number().min(0),
+  value: number().min(0).max(99999999.99),
   type: mixed<BudgetItem["type"]>().oneOf(BUDGET_ITEMS_TYPES),
 }).test((fields, context) => {
   if (areAllValuesUndefined(fields))
@@ -41,30 +41,30 @@ export const handler = async (
       event.body
     );
 
-    const foundBudgetItem = await db
+    const foundBudget = await db
       .selectFrom("budgets")
       .where("budgets.id", "=", budgetId)
       .selectAll()
       .select((eb) => [
-        jsonArrayFrom(
+        jsonObjectFrom(
           eb
             .selectFrom("budget_items")
             .selectAll()
             .whereRef("budget_items.budget_id", "=", "budgets.id")
             .where("budget_items.id", "=", budgetItemId)
-        ).as("budget_items"),
+        ).as("budget_item"),
       ])
       .executeTakeFirst();
 
-    if (!foundBudgetItem) {
+    if (!foundBudget) {
       throw new NotFoundError("This budget does not exist.");
     }
 
-    if (foundBudgetItem.user_id !== decodedUser.id) {
+    if (foundBudget.user_id !== decodedUser.id) {
       throw new ForbiddenError();
     }
 
-    if (!foundBudgetItem.budget_items[0]) {
+    if (!foundBudget.budget_item) {
       throw new NotFoundError("This budget item does not exist.");
     }
 

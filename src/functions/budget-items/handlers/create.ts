@@ -10,7 +10,7 @@ import { ForbiddenError } from "../../../errors/forbiddenError";
 
 const bodySchema = object({
   description: string().required(),
-  value: number().required().min(0),
+  value: number().required().min(0).max(99999999.99),
   type: mixed<BudgetItem["type"]>().required().oneOf(BUDGET_ITEMS_TYPES),
 });
 
