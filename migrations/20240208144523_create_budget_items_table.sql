@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS budget_items (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     type VARCHAR(8) CHECK (type IN ('EXPENSES', 'INCOME')),
-    description TEXT NOT NULL,
+    description CITEXT NOT NULL,
     value NUMERIC(10, 2) NOT NULL CHECK (value >= 0),
     budget_id UUID NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

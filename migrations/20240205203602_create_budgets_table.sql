@@ -2,10 +2,13 @@
 -- Enable the uuid-ossp extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- case insensitive text
+CREATE EXTENSION IF NOT EXISTS citext;  
+
 -- Create the budgets table
 CREATE TABLE IF NOT EXISTS budgets (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    title TEXT NOT NULL,
+    title CITEXT NOT NULL,
     is_pinned BOOLEAN DEFAULT false,
     user_id TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
