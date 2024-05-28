@@ -8,10 +8,10 @@ const app = new Hono();
 const spec: OpenAPIV3_1.Document = {
   openapi: "3.1.0",
   info: {
-    title: "Budget Calculator API",
+    title: "Budget Calculator API Documentation",
     version: "0.0.1",
     description:
-      "This is the API for the <a href='https://budget.gsavvidis.com' target='_blank'>Budget Calculator</a> project, created by <a href='https://cv.gsavvidis.com' target='_blank'>Giannis Savvidis</a>",
+      "This is the API Documentation for the <a href='https://budget.gsavvidis.com' target='_blank'>Budget Calculator</a> project, created by <a href='https://cv.gsavvidis.com' target='_blank'>Giannis Savvidis</a>",
     contact: {
       name: "Giannis Savvidis",
       url: "https://cv.gsavvidis.com",
@@ -29,12 +29,8 @@ const spec: OpenAPIV3_1.Document = {
   },
   servers: [
     {
-      url: "http://localhost:3000",
-      description: "Development Server (Local)",
-    },
-    {
-      url: "https://d5syzaqyf7.execute-api.eu-south-1.amazonaws.com",
-      description: "Development Server (Deployed)",
+      url: "https://budget-api.gsavvidis.com",
+      description: "Production API",
     },
   ],
 };
