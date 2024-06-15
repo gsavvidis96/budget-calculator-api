@@ -44,7 +44,7 @@ export const handler = async (
       statusCode: 200,
       body: JSON.stringify(deletedBudget),
     };
-  } catch (e: any) {
+  } catch (e) {
     return handleError(e);
   } finally {
     pool.end();

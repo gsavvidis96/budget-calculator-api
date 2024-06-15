@@ -7,7 +7,7 @@ export const validateBody = async <T extends AnyObject>(
 ) => {
   try {
     return await schema.validate(JSON.parse(body || "{}"), { strict: true });
-  } catch (e: any) {
+  } catch (e) {
     if (e instanceof ValidationError) {
       throw new RequestValidationError(e);
     }

@@ -1,5 +1,6 @@
 import { CustomError, SerializedError } from "../errors/customError";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const handleError = (error: any) => {
   if (error instanceof CustomError) {
     return {

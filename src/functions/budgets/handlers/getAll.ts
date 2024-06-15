@@ -27,7 +27,7 @@ export const handler = async (
     ];
     let search = event?.queryStringParameters?.search || "";
 
-    if (Boolean(search)) {
+    if (search) {
       search = `%${search.toLowerCase()}%`;
     }
 
@@ -84,7 +84,7 @@ export const handler = async (
       statusCode: 200,
       body: JSON.stringify(response),
     };
-  } catch (e: any) {
+  } catch (e) {
     return handleError(e);
   } finally {
     pool.end();

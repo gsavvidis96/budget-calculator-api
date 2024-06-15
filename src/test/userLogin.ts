@@ -30,7 +30,7 @@ export const login = async () => {
       body: JSON.stringify({ idToken }),
     } as APIGatewayProxyEventV2)) as APIGatewayProxyStructuredResultV2; // exchange idToken for custom token
 
-    const { customToken } = JSON.parse(result.body!) as any;
+    const { customToken } = JSON.parse(result.body!);
 
     const customTokenResponse = await signInWithCustomToken(auth, customToken); // re-login with custom token
 
