@@ -23,7 +23,7 @@ export const handler = async (
     const sort = event?.queryStringParameters?.sort || "";
     const [sortBy, sortByDirection] = sort.split(":") as [
       string,
-      "asc" | "desc"
+      "asc" | "desc",
     ];
     let search = event?.queryStringParameters?.search || "";
 
