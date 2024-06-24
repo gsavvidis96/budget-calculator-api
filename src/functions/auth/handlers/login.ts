@@ -18,39 +18,39 @@ export const handler = async (
   try {
     const { idToken } = await validateBody(bodySchema, event.body);
 
-    let firebaseUser;
+    let decoded;
+    let forceRefresh = false;
 
     try {
-      firebaseUser = await firebaseAuth.verifyIdToken(idToken); // verify idToken and get the firebase user
+      decoded = await firebaseAuth.verifyIdToken(idToken); // decode idToken
     } catch (e) {
       throw new NotAuthorizedError();
     }
 
-    // upsert user in database with the firebaseUser.uid
-    await db
-      .insertInto("users")
-      .values({
-        id: firebaseUser.uid,
-        email: firebaseUser.email!,
-      })
-      .onConflict((oc) => oc.doNothing())
-      .execute();
+    // if user is not verified
+    if (!decoded?.userVerified) {
+      // usert user in database with the decoded.uid
+      await db
+        .insertInto("users")
+        .values({
+          id: decoded.uid,
+          email: decoded.email!,
+        })
+        .onConflict((oc) => oc.doNothing())
+        .execute();
 
-    const additionalClaims = {
-      userVerified: true,
-    };
-    // add additional claims to the custom token issued
-    // the userVerified property will be used to differentiate the default firebase idToken with the one issued using our custom token
-    // that guarantees that a user record exists in our database
+      // set custom claims to mark user as verified (entry created in postgres database)
+      await firebaseAuth.setCustomUserClaims(decoded.uid, {
+        userVerified: true,
+      });
 
-    const customToken = await firebaseAuth.createCustomToken(
-      firebaseUser.uid,
-      additionalClaims
-    ); // create a custom token so the user can re-authenticate with it on the client
+      // tell the client to refresh the token for the claims to propagate
+      forceRefresh = true;
+    }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ customToken }),
+      body: JSON.stringify({ forceRefresh }),
     };
   } catch (e) {
     return handleError(e);

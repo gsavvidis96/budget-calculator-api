@@ -1,9 +1,5 @@
 import { initializeApp } from "firebase/app";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  signInWithCustomToken,
-} from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { handler as loginHandler } from "../functions/auth/handlers/login";
 import {
   APIGatewayProxyEventV2,
@@ -18,23 +14,21 @@ const auth = getAuth(firebaseApp);
 
 export const login = async () => {
   try {
-    const emailAndPasswordResponse = await signInWithEmailAndPassword(
+    const { user } = await signInWithEmailAndPassword(
       auth,
       process.env.TEST_USER_EMAIL!,
       process.env.TEST_USER_PASSWORD!
     ); // login with firebase
 
-    let idToken = await emailAndPasswordResponse.user.getIdToken(); // get id token
+    let idToken = await user.getIdToken(); // get id token
 
     const result = (await loginHandler({
       body: JSON.stringify({ idToken }),
-    } as APIGatewayProxyEventV2)) as APIGatewayProxyStructuredResultV2; // exchange idToken for custom token
+    } as APIGatewayProxyEventV2)) as APIGatewayProxyStructuredResultV2; // call login to create a user entry if not created
 
-    const { customToken } = JSON.parse(result.body!);
+    const { forceRefresh } = JSON.parse(result.body!);
 
-    const customTokenResponse = await signInWithCustomToken(auth, customToken); // re-login with custom token
-
-    idToken = await customTokenResponse.user.getIdToken(); // get id token
+    if (forceRefresh) idToken = await user.getIdToken(true); // refresh token if its user's first login
 
     return idToken;
   } catch (e) {
