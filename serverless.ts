@@ -9,7 +9,7 @@ const serverlessConfiguration: AWS = {
   useDotenv: true,
   provider: {
     name: "aws",
-    region: "eu-south-1",
+    region: "eu-central-1",
     runtime: "nodejs20.x",
     profile: process.env.AWS_PROFILE,
     deploymentMethod: "direct",
