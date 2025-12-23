@@ -1,5 +1,5 @@
 {
-  "name": "habit-tracker-api",
+  "name": "budget-calculator-api",
   "type": "module",
   "scripts": {
     "dev": "sst dev",
