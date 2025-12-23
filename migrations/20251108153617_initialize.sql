@@ -1,0 +1,18 @@
+-- migrate:up
+CREATE OR REPLACE FUNCTION update_updated_at () RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE EXTENSION IF NOT EXISTS citext;
+
+-- migrate:down
+DROP EXTENSION IF EXISTS "uuid-ossp";
+
+DROP EXTENSION IF EXISTS citext;
+
+DROP FUNCTION IF EXISTS update_updated_at ();

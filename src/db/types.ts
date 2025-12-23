@@ -1,37 +1,28 @@
-import { ColumnType, Selectable } from "kysely";
+import { ColumnType, Generated, GeneratedAlways } from "kysely";
 
 export interface Database {
-  users: UsersTable;
   budgets: BudgetsTable;
   budget_items: BudgetItemsTable;
 }
 
-export interface UsersTable {
-  id: ColumnType<string, string, never>;
-  email: ColumnType<string, string, never>;
-  created_at: ColumnType<string, never, never>;
-  updated_at: ColumnType<string, never, never>;
-}
-
 export interface BudgetsTable {
-  id: ColumnType<string, never, never>;
+  id: GeneratedAlways<string>;
   title: string;
-  is_pinned: ColumnType<boolean, boolean | null, boolean | null>;
+  is_pinned: Generated<boolean>;
   user_id: ColumnType<string, string, never>;
-  created_at: ColumnType<string, never, never>;
-  updated_at: ColumnType<string, never, never>;
+  created_at: GeneratedAlways<string>;
+  updated_at: GeneratedAlways<string>;
 }
 
 export const BUDGET_ITEMS_TYPES = ["EXPENSES", "INCOME"] as const;
+export type BudgetItemType = (typeof BUDGET_ITEMS_TYPES)[number];
 
 export interface BudgetItemsTable {
-  id: ColumnType<string, never, never>;
-  type: (typeof BUDGET_ITEMS_TYPES)[number];
+  id: GeneratedAlways<string>;
+  type: BudgetItemType;
   description: string;
   value: number;
   budget_id: ColumnType<string, string, never>;
-  created_at: ColumnType<string, never, never>;
-  updated_at: ColumnType<string, never, never>;
+  created_at: GeneratedAlways<string>;
+  updated_at: GeneratedAlways<string>;
 }
-
-export type BudgetItem = Selectable<BudgetItemsTable>;

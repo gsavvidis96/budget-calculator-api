@@ -1,8 +1,0 @@
-delete database entry on firebase console user delete
-user soft delete
-eslint & prettier precommit and pre push hooks
-add automated tests
-setup development workflow
-complete docs
-add CI/CD
-add readme

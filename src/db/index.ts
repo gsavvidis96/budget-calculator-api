@@ -1,19 +1,12 @@
-import { Database } from "./types";
-import { Pool, neonConfig, types } from "@neondatabase/serverless";
+import { Pool, types } from "pg";
 import { Kysely, PostgresDialect } from "kysely";
-import ws from "ws";
+import { Database } from "./types";
 
-neonConfig.webSocketConstructor = ws;
-types.setTypeParser(types.builtins.NUMERIC, (value) => parseFloat(value)); // return numeric as float
-types.setTypeParser(types.builtins.TIMESTAMP, (value) => value.toString()); // return dates as strings
-types.setTypeParser(types.builtins.INT8, (value) => parseInt(value)); // return int8 as js int (for count queries)
+types.setTypeParser(types.builtins.NUMERIC, (value) => parseFloat(value));
+types.setTypeParser(types.builtins.INT8, (value) => parseInt(value));
 
-export const getDb = () => {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
-  const db = new Kysely<Database>({ dialect: new PostgresDialect({ pool }) });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-  return {
-    pool,
-    db,
-  };
-};
+export const db = new Kysely<Database>({
+  dialect: new PostgresDialect({ pool }),
+});
