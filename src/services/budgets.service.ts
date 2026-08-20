@@ -1,148 +1,248 @@
-import { ForbiddenError, NotFoundError } from "../utils/errors";
-import {
+import type {
   CreateBudgetInput,
   CreateBudgetItemInput,
-  DeleteBudgetItemInput,
   DeleteBudgetInput,
+  DeleteBudgetItemInput,
+  GetBudgetInput,
+  GetBudgetsInput,
   UpdateBudgetInput,
   UpdateBudgetItemInput,
-  GetBudgetInput,
-  GetBudgetsQueryInput,
 } from "../schemas/budgets.schema";
+import type {
+  Budget,
+  BudgetDetails,
+  BudgetItem,
+  ExpenseBudgetItem,
+  PaginatedBudgets,
+} from "../types";
 import * as budgetsRepository from "../repositories/budgets.repository";
+import { ForbiddenError, NotFoundError } from "../utils/errors";
 
-// GET BUDGETS
-export const getBudgets = async (data: GetBudgetsQueryInput) => {
-  return budgetsRepository.getBudgetsOfUser(data);
+type BudgetRow = {
+  id: string;
+  title: string;
+  is_pinned: boolean;
+  user_id: string;
+  created_at: Date | string;
+  updated_at: Date | string;
 };
 
-// GET BUDGET
-export const getBudget = async ({ user_id, budget_id }: GetBudgetInput) => {
-  const budget = await budgetsRepository.findBudget(budget_id);
+type BudgetItemRow = {
+  id: string;
+  type: BudgetItem["type"];
+  description: string;
+  value: number;
+  budget_id: string;
+  created_at: Date | string;
+  updated_at: Date | string;
+};
+
+const serializeTimestamp = (timestamp: Date | string) => {
+  return timestamp instanceof Date ? timestamp.toISOString() : timestamp;
+};
+
+const mapBudget = (budget: BudgetRow): Budget => ({
+  id: budget.id,
+  title: budget.title,
+  isPinned: budget.is_pinned,
+  userId: budget.user_id,
+  createdAt: serializeTimestamp(budget.created_at),
+  updatedAt: serializeTimestamp(budget.updated_at),
+});
+
+const mapBudgetItem = (item: BudgetItemRow): BudgetItem => ({
+  id: item.id,
+  type: item.type,
+  description: item.description,
+  value: item.value,
+  budgetId: item.budget_id,
+  createdAt: serializeTimestamp(item.created_at),
+  updatedAt: serializeTimestamp(item.updated_at),
+});
+
+const throwBudgetAccessError = async ({
+  userId,
+  budgetId,
+}: GetBudgetInput): Promise<never> => {
+  const budget = await budgetsRepository.findBudget(budgetId);
 
   if (!budget) {
     throw new NotFoundError("This budget does not exist.");
   }
 
-  if (budget.user_id !== user_id) {
+  if (budget.user_id !== userId) {
     throw new ForbiddenError();
   }
 
-  return budgetsRepository.getBudgetWithDetails(budget_id);
+  throw new NotFoundError("This budget does not exist.");
 };
 
-// CREATE BUDGET
-export const createBudget = async (data: CreateBudgetInput) => {
-  return budgetsRepository.createBudget(data);
-};
-
-// UPDATE BUDGET
-export const updateBudget = async (data: UpdateBudgetInput) => {
-  const { user_id, budget_id, ...budgetData } = data;
-
-  const budget = await budgetsRepository.findBudget(budget_id);
+const throwBudgetItemAccessError = async ({
+  userId,
+  budgetId,
+  budgetItemId,
+}: DeleteBudgetItemInput): Promise<never> => {
+  const budget = await budgetsRepository.findBudgetWithItem({
+    budgetId,
+    budgetItemId,
+  });
 
   if (!budget) {
     throw new NotFoundError("This budget does not exist.");
   }
 
-  if (budget.user_id !== user_id) {
+  if (budget.user_id !== userId) {
     throw new ForbiddenError();
   }
 
-  return budgetsRepository.updateBudget(budget.id, budgetData);
+  throw new NotFoundError(
+    `This budget item does not exist or is not part of budget with id ${budgetId}`,
+  );
 };
 
-// DELETE BUDGET
-export const deleteBudget = async ({
-  budget_id,
-  user_id,
-}: DeleteBudgetInput) => {
-  const budget = await budgetsRepository.findBudget(budget_id);
+export const getBudgets = async (
+  data: GetBudgetsInput,
+): Promise<PaginatedBudgets> => {
+  const result = await budgetsRepository.getBudgetsOfUser(data);
 
-  if (!budget) {
-    throw new NotFoundError("This budget does not exist.");
-  }
-
-  if (budget.user_id !== user_id) {
-    throw new ForbiddenError();
-  }
-
-  return budgetsRepository.deleteBudget(budget_id);
+  return {
+    budgets: result.budgets.map((budget) => ({
+      ...mapBudget(budget),
+      balance: budget.balance,
+    })),
+    totalCount: result.totalCount,
+    pageSize: data.limit,
+    pageNumber: Math.floor(data.offset / data.limit) + 1,
+  };
 };
 
-// CREATE BUDGET ITEM
-export const createBudgetItem = async (data: CreateBudgetItemInput) => {
-  const budget = await budgetsRepository.findBudget(data.budget_id);
+export const getBudget = async (
+  data: GetBudgetInput,
+): Promise<BudgetDetails> => {
+  const budget = await budgetsRepository.getBudgetWithDetails(data);
 
   if (!budget) {
-    throw new NotFoundError("This budget does not exist.");
+    return throwBudgetAccessError(data);
   }
 
-  if (budget.user_id !== data.user_id) {
-    throw new ForbiddenError();
+  return {
+    ...mapBudget(budget),
+    totalExpenses: budget.total_expenses,
+    totalIncome: budget.total_income,
+    balance: budget.balance,
+    expensesPercentage: budget.expenses_percentage,
+    expenseItems: budget.expense_items.map((item): ExpenseBudgetItem => ({
+      ...mapBudgetItem(item),
+      expensePercentage: item.expense_percentage,
+    })),
+    incomeItems: budget.income_items.map(mapBudgetItem),
+  };
+};
+
+export const createBudget = async ({
+  userId,
+  title,
+  isPinned,
+}: CreateBudgetInput): Promise<Budget> => {
+  const budget = await budgetsRepository.createBudget({
+    user_id: userId,
+    title,
+    ...(isPinned === undefined ? {} : { is_pinned: isPinned }),
+  });
+
+  return mapBudget(budget);
+};
+
+export const updateBudget = async ({
+  userId,
+  budgetId,
+  title,
+  isPinned,
+}: UpdateBudgetInput): Promise<Budget> => {
+  const budget = await budgetsRepository.updateBudget({
+    budgetId,
+    userId,
+    data: {
+      ...(title === undefined ? {} : { title }),
+      ...(isPinned === undefined ? {} : { is_pinned: isPinned }),
+    },
+  });
+
+  if (!budget) {
+    return throwBudgetAccessError({ userId, budgetId });
   }
 
-  const { budget_id, description, type, value } = data;
+  return mapBudget(budget);
+};
 
-  return budgetsRepository.createBudgetItem({
+export const deleteBudget = async (
+  data: DeleteBudgetInput,
+): Promise<Budget> => {
+  const budget = await budgetsRepository.deleteBudget(data);
+
+  if (!budget) {
+    return throwBudgetAccessError(data);
+  }
+
+  return mapBudget(budget);
+};
+
+export const createBudgetItem = async ({
+  userId,
+  budgetId,
+  description,
+  value,
+  type,
+}: CreateBudgetItemInput): Promise<BudgetItem> => {
+  const item = await budgetsRepository.createBudgetItem({
+    budgetId,
+    userId,
     description,
     value,
     type,
-    budget_id,
   });
+
+  if (!item) {
+    return throwBudgetAccessError({ userId, budgetId });
+  }
+
+  return mapBudgetItem(item);
 };
 
-// UPDATE BUDGET ITEM
-export const updateBudgetItem = async (data: UpdateBudgetItemInput) => {
-  const { user_id, budget_id, budget_item_id, ...budgetItemData } = data;
+export const updateBudgetItem = async ({
+  userId,
+  budgetId,
+  budgetItemId,
+  description,
+  value,
+  type,
+}: UpdateBudgetItemInput): Promise<BudgetItem> => {
+  const item = await budgetsRepository.updateBudgetItem({
+    budgetId,
+    budgetItemId,
+    userId,
+    data: {
+      ...(description === undefined ? {} : { description }),
+      ...(value === undefined ? {} : { value }),
+      ...(type === undefined ? {} : { type }),
+    },
+  });
 
-  const budgetWithItem = await budgetsRepository.findBudgetWithItem(
-    budget_id,
-    budget_item_id,
-  );
-
-  if (!budgetWithItem) {
-    throw new NotFoundError("This budget does not exist.");
+  if (!item) {
+    return throwBudgetItemAccessError({ userId, budgetId, budgetItemId });
   }
 
-  if (budgetWithItem.user_id !== user_id) {
-    throw new ForbiddenError();
-  }
-
-  if (!budgetWithItem.budget_item) {
-    throw new NotFoundError(
-      `This budget item does not exist or is not part of budget with id ${budget_id}`,
-    );
-  }
-
-  return budgetsRepository.updateBudgetItem(budget_item_id, budgetItemData);
+  return mapBudgetItem(item);
 };
 
-// DELETE BUDGET ITEM
-export const deleteBudgetItem = async ({
-  budget_id,
-  user_id,
-  budget_item_id,
-}: DeleteBudgetItemInput) => {
-  const budgetWithItem = await budgetsRepository.findBudgetWithItem(
-    budget_id,
-    budget_item_id,
-  );
+export const deleteBudgetItem = async (
+  data: DeleteBudgetItemInput,
+): Promise<BudgetItem> => {
+  const item = await budgetsRepository.deleteBudgetItem(data);
 
-  if (!budgetWithItem) {
-    throw new NotFoundError("This budget does not exist.");
+  if (!item) {
+    return throwBudgetItemAccessError(data);
   }
 
-  if (budgetWithItem.user_id !== user_id) {
-    throw new ForbiddenError();
-  }
-
-  if (!budgetWithItem.budget_item) {
-    throw new NotFoundError(
-      `This budget item does not exist or is not part of budget with id ${budget_id}`,
-    );
-  }
-
-  return budgetsRepository.deleteBudgetItem(budget_item_id);
+  return mapBudgetItem(item);
 };

@@ -1,50 +1,20 @@
-import { ErrorHandler } from "hono";
-import { HTTPResponseError } from "hono/types";
-import {
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "../utils/errors";
+import type { ErrorHandler } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { createErrorResponse } from "../utils/errors";
+import { isPostgresError } from "../utils/postgres";
 
-interface PostgresError extends Error {
-  code: string;
-  detail?: string;
-  table?: string;
-  constraint?: string;
-}
-
-const isPostgresError = (
-  err: Error | HTTPResponseError,
-): err is PostgresError => {
-  return (
-    typeof err === "object" &&
-    err !== null &&
-    "code" in err &&
-    typeof (err as PostgresError).code === "string"
-  );
-};
-
-const errorMiddleware: ErrorHandler = (err, c) => {
-  if (isPostgresError(err)) {
-    if (err.code === "23505")
-      return c.json({ message: "Resource already exists" }, 409);
+const errorMiddleware: ErrorHandler = (error, c) => {
+  if (isPostgresError(error) && error.code === "23505") {
+    return c.json(createErrorResponse("Resource already exists"), 409);
   }
 
-  if (err instanceof UnauthorizedError) {
-    return c.json({ message: err.message }, 401);
+  if (error instanceof HTTPException) {
+    return c.json(createErrorResponse(error.message), error.status);
   }
 
-  if (err instanceof ForbiddenError) {
-    return c.json({ message: err.message }, 403);
-  }
+  console.error(error);
 
-  if (err instanceof NotFoundError) {
-    return c.json({ message: err.message }, 404);
-  }
-
-  console.error(err);
-
-  return c.json({ message: "Something went wrong" }, 500);
+  return c.json(createErrorResponse("Something went wrong"), 500);
 };
 
 export default errorMiddleware;

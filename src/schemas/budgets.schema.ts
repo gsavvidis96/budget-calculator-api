@@ -1,18 +1,22 @@
 import { z } from "zod";
-import { BUDGET_ITEMS_TYPES } from "../db/types";
+import { BUDGET_ITEM_TYPES } from "../db/types";
 
-export const SUPPORTED_SORT_FIELDS = ["balance", "created_at"] as const; // supported sortable fields
-export type SupportedFields = (typeof SUPPORTED_SORT_FIELDS)[number];
+export const SUPPORTED_SORT_FIELDS = ["balance", "created_at"] as const;
 
-// ZOD SCHEMAS FOR VALIDATION
+const moneySchema = z
+  .number()
+  .nonnegative()
+  .max(99_999_999.99)
+  .multipleOf(0.01);
+
 export const createBudgetSchema = z.object({
-  title: z.string().trim(),
+  title: z.string().trim().min(1),
   is_pinned: z.boolean().optional(),
 });
 
 export const updateBudgetSchema = z
   .object({
-    title: z.string().trim().optional(),
+    title: z.string().trim().min(1).optional(),
     is_pinned: z.boolean().optional(),
   })
   .refine((data) => Object.values(data).some((value) => value !== undefined), {
@@ -20,16 +24,16 @@ export const updateBudgetSchema = z
   });
 
 export const createBudgetItemSchema = z.object({
-  description: z.string().trim(),
-  value: z.number().min(0),
-  type: z.enum(BUDGET_ITEMS_TYPES),
+  description: z.string().trim().min(1),
+  value: moneySchema,
+  type: z.enum(BUDGET_ITEM_TYPES),
 });
 
 export const updateBudgetItemSchema = z
   .object({
-    description: z.string().trim().optional(),
-    value: z.number().min(0).optional(),
-    type: z.enum(BUDGET_ITEMS_TYPES).optional(),
+    description: z.string().trim().min(1).optional(),
+    value: moneySchema.optional(),
+    type: z.enum(BUDGET_ITEM_TYPES).optional(),
   })
   .refine((data) => Object.values(data).some((value) => value !== undefined), {
     message: "At least one field must be provided",
@@ -41,57 +45,76 @@ export const budgetIdParamSchema = z.object({
 
 export const budgetItemIdParamSchema = z.object({
   id: z.uuid("Invalid budget ID format"),
-  budget_item_id: z.uuid("Invalid budget ID format"),
+  budget_item_id: z.uuid("Invalid budget item ID format"),
 });
 
 export const getBudgetsQuerySchema = z.object({
   search: z.string().optional(),
-  limit: z.coerce.number().min(1).max(100).catch(10),
-  offset: z.coerce.number().min(0).catch(0),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+  offset: z.coerce.number().int().min(0).default(0),
   sort: z
     .string()
     .regex(new RegExp(`^(${SUPPORTED_SORT_FIELDS.join("|")}):(asc|desc)$`))
-    .catch("created_at:desc"),
+    .default("created_at:desc"),
 });
 
-// SERVICE INPUT TYPES
+export type CreateBudgetBody = z.infer<typeof createBudgetSchema>;
+export type UpdateBudgetBody = z.infer<typeof updateBudgetSchema>;
+export type CreateBudgetItemBody = z.infer<typeof createBudgetItemSchema>;
+export type UpdateBudgetItemBody = z.infer<typeof updateBudgetItemSchema>;
+export type GetBudgetsQuery = z.infer<typeof getBudgetsQuerySchema>;
+
+export type BudgetSortField = "balance" | "createdAt";
+export type SortDirection = "asc" | "desc";
+
+export type GetBudgetsInput = {
+  userId: string;
+  search?: string;
+  limit: number;
+  offset: number;
+  sortField: BudgetSortField;
+  sortDirection: SortDirection;
+};
 
 export type GetBudgetInput = {
-  budget_id: string;
-  user_id: string;
+  budgetId: string;
+  userId: string;
 };
 
-export type CreateBudgetInput = z.infer<typeof createBudgetSchema> & {
-  user_id: string;
+export type CreateBudgetInput = {
+  title: string;
+  isPinned?: boolean;
+  userId: string;
 };
 
-export type UpdateBudgetInput = z.infer<typeof updateBudgetSchema> & {
-  user_id: string;
-  budget_id: string;
+export type UpdateBudgetInput = {
+  budgetId: string;
+  title?: string;
+  isPinned?: boolean;
+  userId: string;
 };
 
-export type DeleteBudgetInput = {
-  budget_id: string;
-  user_id: string;
+export type DeleteBudgetInput = GetBudgetInput;
+
+export type CreateBudgetItemInput = {
+  budgetId: string;
+  description: string;
+  type: (typeof BUDGET_ITEM_TYPES)[number];
+  userId: string;
+  value: number;
 };
 
-export type CreateBudgetItemInput = z.infer<typeof createBudgetItemSchema> & {
-  user_id: string;
-  budget_id: string;
-};
-
-export type UpdateBudgetItemInput = z.infer<typeof updateBudgetItemSchema> & {
-  user_id: string;
-  budget_id: string;
-  budget_item_id: string;
+export type UpdateBudgetItemInput = {
+  budgetId: string;
+  budgetItemId: string;
+  description?: string;
+  type?: (typeof BUDGET_ITEM_TYPES)[number];
+  userId: string;
+  value?: number;
 };
 
 export type DeleteBudgetItemInput = {
-  budget_id: string;
-  user_id: string;
-  budget_item_id: string;
-};
-
-export type GetBudgetsQueryInput = z.infer<typeof getBudgetsQuerySchema> & {
-  user_id: string;
+  budgetId: string;
+  budgetItemId: string;
+  userId: string;
 };

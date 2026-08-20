@@ -6,6 +6,7 @@ export default defineConfig(
   {
     ignores: [
       ".sst/",
+      "coverage/",
       "node_modules/",
       "*.config.js",
       "*.config.mjs",

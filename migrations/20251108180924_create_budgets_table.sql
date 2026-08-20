@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS budgets (
 );
 
 -- Attach the trigger function to the budgets table
-CREATE TRIGGER update_budgets_updated_at BEFORE
-UPDATE ON budgets FOR EACH ROW
+CREATE TRIGGER update_budgets_updated_at
+BEFORE UPDATE ON budgets FOR EACH ROW
 EXECUTE FUNCTION update_updated_at ();
 
 -- migrate:down

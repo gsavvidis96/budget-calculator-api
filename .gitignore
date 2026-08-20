@@ -2,6 +2,7 @@
 .DS_Store
 
 .sst
+coverage
 sst-env.d.ts
 
 node_modules

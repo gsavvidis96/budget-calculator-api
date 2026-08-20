@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
-import { ValidationTargets } from "hono";
-import { ZodType } from "zod";
+import type { ValidationTargets } from "hono";
+import type { ZodType } from "zod";
+import { createErrorResponse } from "../utils/errors";
 
 const validationMiddleware = <
   T extends ZodType,
@@ -11,7 +12,19 @@ const validationMiddleware = <
 ) => {
   return zValidator(target, schema, (result, c) => {
     if (!result.success) {
-      return c.json(result.error.issues, 400);
+      return c.json(
+        createErrorResponse(
+          "Validation failed",
+          result.error.issues.map((issue) => ({
+            field:
+              issue.path.length > 0
+                ? issue.path.map(String).join(".")
+                : undefined,
+            message: issue.message,
+          })),
+        ),
+        400,
+      );
     }
   });
 };

@@ -3,9 +3,5 @@
 import { db } from "./db";
 
 export const handler = async () => {
-  try {
-    return db.selectFrom("budgets").selectAll().limit(10).execute();
-  } catch (e) {
-    console.error(e);
-  }
+  return db.selectFrom("budgets").select("id").limit(1).execute();
 };

@@ -6,8 +6,10 @@ export default $config({
       home: "aws",
       name: "budget-calculator-api",
       protect: ["production"].includes(input?.stage),
-      providers: { cloudflare: "6.11.0" },
       removal: input?.stage === "production" ? "retain" : "remove",
+      providers: {
+        cloudflare: { package: "@pulumi/cloudflare", version: "6.15.0" },
+      },
     };
   },
   async run() {
@@ -15,7 +17,7 @@ export default $config({
 
     new sst.aws.Function("Api", {
       handler: "src/index.handler",
-      runtime: "nodejs22.x",
+      runtime: "nodejs24.x",
       url: isProduction
         ? {
             router: {
@@ -35,17 +37,15 @@ export default $config({
     });
 
     if (isProduction) {
-      /* THIS IS TO KEEP SUPABASE ALIVE DUE TO FREE TIER CONSTRAINT */
-
       const cronFn = new sst.aws.Function("CronFn", {
         handler: "src/supabase-keepalive.handler",
-        runtime: "nodejs22.x",
+        runtime: "nodejs24.x",
         environment: {
           DATABASE_URL: process.env.DATABASE_URL || "",
         },
       });
 
-      new sst.aws.Cron("Cron", {
+      new sst.aws.CronV2("Cron", {
         function: cronFn.arn,
         schedule: "rate(1 day)",
       });

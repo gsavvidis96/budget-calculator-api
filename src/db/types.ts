@@ -1,4 +1,4 @@
-import { ColumnType, Generated, GeneratedAlways } from "kysely";
+import type { ColumnType, Generated, GeneratedAlways } from "kysely";
 
 export interface Database {
   budgets: BudgetsTable;
@@ -10,12 +10,12 @@ export interface BudgetsTable {
   title: string;
   is_pinned: Generated<boolean>;
   user_id: ColumnType<string, string, never>;
-  created_at: GeneratedAlways<string>;
-  updated_at: GeneratedAlways<string>;
+  created_at: GeneratedAlways<Date>;
+  updated_at: GeneratedAlways<Date>;
 }
 
-export const BUDGET_ITEMS_TYPES = ["EXPENSES", "INCOME"] as const;
-export type BudgetItemType = (typeof BUDGET_ITEMS_TYPES)[number];
+export const BUDGET_ITEM_TYPES = ["EXPENSES", "INCOME"] as const;
+export type BudgetItemType = (typeof BUDGET_ITEM_TYPES)[number];
 
 export interface BudgetItemsTable {
   id: GeneratedAlways<string>;
@@ -23,6 +23,6 @@ export interface BudgetItemsTable {
   description: string;
   value: number;
   budget_id: ColumnType<string, string, never>;
-  created_at: GeneratedAlways<string>;
-  updated_at: GeneratedAlways<string>;
+  created_at: GeneratedAlways<Date>;
+  updated_at: GeneratedAlways<Date>;
 }

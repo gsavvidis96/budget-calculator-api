@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS budget_items (
   UNIQUE (budget_id, type, description)
 );
 
-CREATE TRIGGER update_budget_items_updated_at BEFORE
-UPDATE ON budget_items FOR EACH ROW
+CREATE TRIGGER update_budget_items_updated_at
+BEFORE UPDATE ON budget_items FOR EACH ROW
 EXECUTE FUNCTION update_updated_at ();
 
 -- migrate:down
