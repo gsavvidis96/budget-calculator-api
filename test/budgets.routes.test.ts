@@ -13,6 +13,7 @@ const service = vi.hoisted(() => ({
   deleteBudgetItem: vi.fn(),
   getBudget: vi.fn(),
   getBudgets: vi.fn(),
+  reorderBudgetItems: vi.fn(),
   updateBudget: vi.fn(),
   updateBudgetItem: vi.fn(),
 }));
@@ -43,6 +44,7 @@ const incomeItem = {
   type: "INCOME" as const,
   description: "Salary",
   value: 2500,
+  position: 0,
   budgetId: BUDGET_ID,
   createdAt: "2026-08-19T08:00:00.000Z",
   updatedAt: "2026-08-19T08:00:00.000Z",
@@ -181,6 +183,34 @@ describe("budget routes", () => {
       id: ITEM_ID,
       budget_id: BUDGET_ID,
       type: "INCOME",
+      position: 0,
+    });
+  });
+
+  it("maps and returns a complete reordered item sequence", async () => {
+    service.reorderBudgetItems.mockResolvedValue([incomeItem]);
+
+    const response = await app.request(
+      `/budgets/${BUDGET_ID}/budget-items/reorder`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "INCOME",
+          budget_item_ids: [ITEM_ID],
+        }),
+      },
+    );
+
+    expect(service.reorderBudgetItems).toHaveBeenCalledWith({
+      userId: USER_ID,
+      budgetId: BUDGET_ID,
+      type: "INCOME",
+      budgetItemIds: [ITEM_ID],
+    });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      budget_items: [{ id: ITEM_ID, position: 0 }],
     });
   });
 

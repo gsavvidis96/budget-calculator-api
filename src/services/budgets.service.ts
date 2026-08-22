@@ -5,6 +5,7 @@ import type {
   DeleteBudgetItemInput,
   GetBudgetInput,
   GetBudgetsInput,
+  ReorderBudgetItemsInput,
   UpdateBudgetInput,
   UpdateBudgetItemInput,
 } from "../schemas/budgets.schema";
@@ -16,7 +17,11 @@ import type {
   PaginatedBudgets,
 } from "../types";
 import * as budgetsRepository from "../repositories/budgets.repository";
-import { ForbiddenError, NotFoundError } from "../utils/errors";
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from "../utils/errors";
 
 type BudgetRow = {
   id: string;
@@ -32,6 +37,7 @@ type BudgetItemRow = {
   type: BudgetItem["type"];
   description: string;
   value: number;
+  position: number;
   budget_id: string;
   created_at: Date | string;
   updated_at: Date | string;
@@ -55,6 +61,7 @@ const mapBudgetItem = (item: BudgetItemRow): BudgetItem => ({
   type: item.type,
   description: item.description,
   value: item.value,
+  position: item.position,
   budgetId: item.budget_id,
   createdAt: serializeTimestamp(item.created_at),
   updatedAt: serializeTimestamp(item.updated_at),
@@ -215,7 +222,6 @@ export const updateBudgetItem = async ({
   budgetItemId,
   description,
   value,
-  type,
 }: UpdateBudgetItemInput): Promise<BudgetItem> => {
   const item = await budgetsRepository.updateBudgetItem({
     budgetId,
@@ -224,7 +230,6 @@ export const updateBudgetItem = async ({
     data: {
       ...(description === undefined ? {} : { description }),
       ...(value === undefined ? {} : { value }),
-      ...(type === undefined ? {} : { type }),
     },
   });
 
@@ -245,4 +250,22 @@ export const deleteBudgetItem = async (
   }
 
   return mapBudgetItem(item);
+};
+
+export const reorderBudgetItems = async (
+  data: ReorderBudgetItemsInput,
+): Promise<BudgetItem[]> => {
+  const result = await budgetsRepository.reorderBudgetItems(data);
+
+  if (result.status === "budget_not_found") {
+    return throwBudgetAccessError(data);
+  }
+
+  if (result.status === "invalid_items") {
+    throw new BadRequestError(
+      "Budget item IDs must exactly match the items in the selected type",
+    );
+  }
+
+  return result.items.map(mapBudgetItem);
 };

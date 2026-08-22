@@ -10,6 +10,7 @@ const repository = vi.hoisted(() => ({
   findBudgetWithItem: vi.fn(),
   getBudgetWithDetails: vi.fn(),
   getBudgetsOfUser: vi.fn(),
+  reorderBudgetItems: vi.fn(),
   updateBudget: vi.fn(),
   updateBudgetItem: vi.fn(),
 }));
@@ -37,6 +38,7 @@ const itemRow = {
   type: "INCOME" as const,
   description: "Salary",
   value: 2500,
+  position: 0,
   budget_id: BUDGET_ID,
   created_at: "2026-08-19T08:00:00.000Z",
   updated_at: "2026-08-19T08:00:00.000Z",
@@ -178,5 +180,38 @@ describe("budget service", () => {
       budgetId: BUDGET_ID,
       description: "Salary",
     });
+  });
+
+  it("maps reordered budget items", async () => {
+    repository.reorderBudgetItems.mockResolvedValue({
+      status: "success",
+      items: [itemRow],
+    });
+
+    await expect(
+      budgetsService.reorderBudgetItems({
+        userId: USER_ID,
+        budgetId: BUDGET_ID,
+        type: "INCOME",
+        budgetItemIds: [ITEM_ID],
+      }),
+    ).resolves.toMatchObject([{ id: ITEM_ID, position: 0 }]);
+  });
+
+  it("rejects a reorder list that does not exactly match the type", async () => {
+    repository.reorderBudgetItems.mockResolvedValue({
+      status: "invalid_items",
+    });
+
+    await expect(
+      budgetsService.reorderBudgetItems({
+        userId: USER_ID,
+        budgetId: BUDGET_ID,
+        type: "INCOME",
+        budgetItemIds: [],
+      }),
+    ).rejects.toThrow(
+      "Budget item IDs must exactly match the items in the selected type",
+    );
   });
 });

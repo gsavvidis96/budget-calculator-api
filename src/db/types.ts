@@ -22,6 +22,7 @@ export interface BudgetItemsTable {
   type: BudgetItemType;
   description: string;
   value: number;
+  position: number;
   budget_id: ColumnType<string, string, never>;
   created_at: GeneratedAlways<Date>;
   updated_at: GeneratedAlways<Date>;

@@ -57,7 +57,7 @@ describe("budget repository queries", () => {
     expect(compiled.sql).toContain('"expense_items" as');
     expect(compiled.sql).toContain('"income_items" as');
     expect(compiled.sql).toContain('as "expenses_percentage"');
-    expect(compiled.sql).toContain('order by "created_at", "id"');
+    expect(compiled.sql).toContain('order by "position", "id"');
     expect(compiled.sql).toContain('where "budgets"."id" =');
     expect(compiled.parameters).toContain(BUDGET_ID);
     expect(compiled.parameters).toContain(USER_ID);
@@ -88,6 +88,7 @@ describe("budget repository queries", () => {
     expect(compiled.sql).toContain('where "budgets"."id" =');
     expect(compiled.sql).toContain('and "budgets"."user_id" =');
     expect(compiled.sql).toContain("for key share");
+    expect(compiled.sql).toContain("MAX(position)");
     expect(compiled.sql).toContain("returning *");
   });
 });

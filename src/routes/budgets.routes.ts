@@ -7,6 +7,7 @@ import {
   createBudgetItemSchema,
   createBudgetSchema,
   getBudgetsQuerySchema,
+  reorderBudgetItemsSchema,
   updateBudgetItemSchema,
   updateBudgetSchema,
   type BudgetSortField,
@@ -42,6 +43,7 @@ const toBudgetItemResponse = (item: BudgetItem) => ({
   type: item.type,
   description: item.description,
   value: item.value,
+  position: item.position,
   budget_id: item.budgetId,
   created_at: item.createdAt,
   updated_at: item.updatedAt,
@@ -186,10 +188,28 @@ budgetsRoutes.patch(
       budgetItemId,
       description: body.description,
       value: body.value,
-      type: body.type,
     });
 
     return c.json(toBudgetItemResponse(item));
+  },
+);
+
+budgetsRoutes.put(
+  "/:id/budget-items/reorder",
+  validationMiddleware("param", budgetIdParamSchema),
+  validationMiddleware("json", reorderBudgetItemsSchema),
+  async (c) => {
+    const { id: userId } = c.get("user");
+    const { id: budgetId } = c.req.valid("param");
+    const { type, budget_item_ids: budgetItemIds } = c.req.valid("json");
+    const items = await budgetsService.reorderBudgetItems({
+      userId,
+      budgetId,
+      type,
+      budgetItemIds,
+    });
+
+    return c.json({ budget_items: items.map(toBudgetItemResponse) });
   },
 );
 

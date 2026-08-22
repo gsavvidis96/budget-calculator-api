@@ -33,11 +33,20 @@ export const updateBudgetItemSchema = z
   .object({
     description: z.string().trim().min(1).optional(),
     value: moneySchema.optional(),
-    type: z.enum(BUDGET_ITEM_TYPES).optional(),
   })
+  .strict()
   .refine((data) => Object.values(data).some((value) => value !== undefined), {
     message: "At least one field must be provided",
   });
+
+export const reorderBudgetItemsSchema = z.object({
+  type: z.enum(BUDGET_ITEM_TYPES),
+  budget_item_ids: z
+    .array(z.uuid("Invalid budget item ID format"))
+    .refine((ids) => new Set(ids).size === ids.length, {
+      message: "Budget item IDs must be unique",
+    }),
+});
 
 export const budgetIdParamSchema = z.object({
   id: z.uuid("Invalid budget ID format"),
@@ -62,6 +71,7 @@ export type CreateBudgetBody = z.infer<typeof createBudgetSchema>;
 export type UpdateBudgetBody = z.infer<typeof updateBudgetSchema>;
 export type CreateBudgetItemBody = z.infer<typeof createBudgetItemSchema>;
 export type UpdateBudgetItemBody = z.infer<typeof updateBudgetItemSchema>;
+export type ReorderBudgetItemsBody = z.infer<typeof reorderBudgetItemsSchema>;
 export type GetBudgetsQuery = z.infer<typeof getBudgetsQuerySchema>;
 
 export type BudgetSortField = "balance" | "createdAt";
@@ -108,9 +118,15 @@ export type UpdateBudgetItemInput = {
   budgetId: string;
   budgetItemId: string;
   description?: string;
-  type?: (typeof BUDGET_ITEM_TYPES)[number];
   userId: string;
   value?: number;
+};
+
+export type ReorderBudgetItemsInput = {
+  budgetId: string;
+  budgetItemIds: string[];
+  type: (typeof BUDGET_ITEM_TYPES)[number];
+  userId: string;
 };
 
 export type DeleteBudgetItemInput = {

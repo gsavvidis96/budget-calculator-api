@@ -5,6 +5,7 @@ import {
   createBudgetItemSchema,
   createBudgetSchema,
   getBudgetsQuerySchema,
+  reorderBudgetItemsSchema,
   updateBudgetItemSchema,
   updateBudgetSchema,
 } from "../src/schemas/budgets.schema";
@@ -67,6 +68,38 @@ describe("budget schemas", () => {
   it("requires at least one patch field", () => {
     expect(updateBudgetSchema.safeParse({}).success).toBe(false);
     expect(updateBudgetItemSchema.safeParse({}).success).toBe(false);
+  });
+
+  it("validates complete reorder payload syntax", () => {
+    const itemId = "4523254d-07b5-4156-86d6-b296b1fb4a36";
+
+    expect(
+      reorderBudgetItemsSchema.safeParse({
+        type: "EXPENSES",
+        budget_item_ids: [itemId],
+      }).success,
+    ).toBe(true);
+    expect(
+      reorderBudgetItemsSchema.safeParse({
+        type: "EXPENSES",
+        budget_item_ids: [itemId, itemId],
+      }).success,
+    ).toBe(false);
+    expect(
+      reorderBudgetItemsSchema.safeParse({
+        type: "EXPENSES",
+        budget_item_ids: ["invalid"],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("disallows changing a budget item's type", () => {
+    expect(
+      updateBudgetItemSchema.safeParse({
+        description: "Salary",
+        type: "EXPENSES",
+      }).success,
+    ).toBe(false);
   });
 
   it("validates both route IDs with distinct field messages", () => {

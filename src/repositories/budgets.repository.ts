@@ -1,4 +1,4 @@
-import type { Insertable, Updateable } from "kysely";
+import type { Insertable, Selectable, Updateable } from "kysely";
 import { sql } from "kysely";
 import { jsonArrayFrom, jsonObjectFrom } from "kysely/helpers/postgres";
 import { db } from "../db";
@@ -71,7 +71,7 @@ export const buildCreateBudgetItemQuery = ({
 }: CreateBudgetItemRepositoryInput) => {
   return db
     .insertInto("budget_items")
-    .columns(["budget_id", "description", "value", "type"])
+    .columns(["budget_id", "description", "value", "type", "position"])
     .expression((eb) =>
       eb
         .selectFrom("budgets")
@@ -80,6 +80,20 @@ export const buildCreateBudgetItemQuery = ({
           eb.val(description).as("description"),
           eb.val(value).as("value"),
           eb.val(type).as("type"),
+          sql<number>`
+            COALESCE(
+              (
+                SELECT
+                  MAX(position)
+                FROM
+                  budget_items
+                WHERE
+                  budget_id = budgets.id
+                  AND type = ${type}
+              ),
+              -1
+            ) + 1
+          `.as("position"),
         ])
         .where("budgets.id", "=", budgetId)
         .where("budgets.user_id", "=", userId)
@@ -91,7 +105,38 @@ export const buildCreateBudgetItemQuery = ({
 export const createBudgetItem = async (
   data: CreateBudgetItemRepositoryInput,
 ) => {
-  return buildCreateBudgetItemQuery(data).executeTakeFirst();
+  return db.transaction().execute(async (transaction) => {
+    const budget = await transaction
+      .selectFrom("budgets")
+      .select("id")
+      .where("id", "=", data.budgetId)
+      .where("user_id", "=", data.userId)
+      .forUpdate()
+      .executeTakeFirst();
+
+    if (!budget) {
+      return undefined;
+    }
+
+    const lastItem = await transaction
+      .selectFrom("budget_items")
+      .select((eb) => eb.fn.max<number>("position").as("position"))
+      .where("budget_id", "=", data.budgetId)
+      .where("type", "=", data.type)
+      .executeTakeFirstOrThrow();
+
+    return transaction
+      .insertInto("budget_items")
+      .values({
+        budget_id: data.budgetId,
+        description: data.description,
+        value: data.value,
+        type: data.type,
+        position: (lastItem.position ?? -1) + 1,
+      })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+  });
 };
 
 export const findBudgetWithItem = async ({
@@ -154,20 +199,117 @@ export const deleteBudgetItem = async ({
   budgetItemId: string;
   userId: string;
 }) => {
-  return db
-    .deleteFrom("budget_items")
-    .where("id", "=", budgetItemId)
-    .where(
-      "budget_id",
-      "in",
-      db
-        .selectFrom("budgets")
-        .select("id")
-        .where("id", "=", budgetId)
-        .where("user_id", "=", userId),
-    )
-    .returningAll()
-    .executeTakeFirst();
+  return db.transaction().execute(async (transaction) => {
+    const budget = await transaction
+      .selectFrom("budgets")
+      .select("id")
+      .where("id", "=", budgetId)
+      .where("user_id", "=", userId)
+      .forUpdate()
+      .executeTakeFirst();
+
+    if (!budget) {
+      return undefined;
+    }
+
+    const item = await transaction
+      .deleteFrom("budget_items")
+      .where("id", "=", budgetItemId)
+      .where("budget_id", "=", budgetId)
+      .returningAll()
+      .executeTakeFirst();
+
+    if (!item) {
+      return undefined;
+    }
+
+    await sql`
+      SET CONSTRAINTS budget_items_budget_type_position_unique DEFERRED
+    `.execute(transaction);
+
+    await transaction
+      .updateTable("budget_items")
+      .set({ position: sql<number>`position - 1` })
+      .where("budget_id", "=", budgetId)
+      .where("type", "=", item.type)
+      .where("position", ">", item.position)
+      .execute();
+
+    return item;
+  });
+};
+
+export type ReorderBudgetItemsRepositoryResult =
+  | { status: "success"; items: Selectable<BudgetItemsTable>[] }
+  | { status: "budget_not_found" }
+  | { status: "invalid_items" };
+
+export const reorderBudgetItems = async ({
+  budgetId,
+  userId,
+  type,
+  budgetItemIds,
+}: {
+  budgetId: string;
+  userId: string;
+  type: BudgetItemsTable["type"];
+  budgetItemIds: string[];
+}): Promise<ReorderBudgetItemsRepositoryResult> => {
+  return db.transaction().execute(async (transaction) => {
+    const budget = await transaction
+      .selectFrom("budgets")
+      .select("id")
+      .where("id", "=", budgetId)
+      .where("user_id", "=", userId)
+      .forUpdate()
+      .executeTakeFirst();
+
+    if (!budget) {
+      return { status: "budget_not_found" };
+    }
+
+    const currentItems = await transaction
+      .selectFrom("budget_items")
+      .select("id")
+      .where("budget_id", "=", budgetId)
+      .where("type", "=", type)
+      .forUpdate()
+      .execute();
+    const submittedIds = new Set(budgetItemIds);
+
+    if (
+      submittedIds.size !== budgetItemIds.length ||
+      currentItems.length !== budgetItemIds.length ||
+      currentItems.some((item) => !submittedIds.has(item.id))
+    ) {
+      return { status: "invalid_items" };
+    }
+
+    await sql`
+      SET CONSTRAINTS budget_items_budget_type_position_unique DEFERRED
+    `.execute(transaction);
+
+    for (const [position, budgetItemId] of budgetItemIds.entries()) {
+      await transaction
+        .updateTable("budget_items")
+        .set({ position })
+        .where("id", "=", budgetItemId)
+        .where("budget_id", "=", budgetId)
+        .where("type", "=", type)
+        .execute();
+    }
+
+    const items = await transaction
+      .selectFrom("budget_items")
+      .selectAll()
+      .where("budget_id", "=", budgetId)
+      .where("type", "=", type)
+      .orderBy("position")
+      .orderBy("id")
+      .execute();
+
+    return { status: "success", items };
+  });
 };
 
 export const buildGetBudgetWithDetailsQuery = ({
@@ -249,7 +391,7 @@ export const buildGetBudgetWithDetailsQuery = ({
           .selectFrom("expense_items")
           .selectAll("expense_items")
           .whereRef("expense_items.budget_id", "=", "budgets.id")
-          .orderBy("created_at")
+          .orderBy("position")
           .orderBy("id"),
       ).as("expense_items"),
       jsonArrayFrom(
@@ -257,7 +399,7 @@ export const buildGetBudgetWithDetailsQuery = ({
           .selectFrom("income_items")
           .selectAll("income_items")
           .whereRef("income_items.budget_id", "=", "budgets.id")
-          .orderBy("created_at")
+          .orderBy("position")
           .orderBy("id"),
       ).as("income_items"),
     ])
