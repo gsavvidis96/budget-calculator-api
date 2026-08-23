@@ -38,6 +38,7 @@ const itemRow = {
   type: "INCOME" as const,
   description: "Salary",
   value: 2500,
+  is_checked: false,
   position: 0,
   budget_id: BUDGET_ID,
   created_at: "2026-08-19T08:00:00.000Z",
@@ -180,6 +181,54 @@ describe("budget service", () => {
       budgetId: BUDGET_ID,
       description: "Salary",
     });
+  });
+
+  it("updates the checked state for an owned expense", async () => {
+    const expenseRow = {
+      ...itemRow,
+      type: "EXPENSES" as const,
+      description: "Rent",
+      is_checked: true,
+    };
+    repository.findBudgetWithItem.mockResolvedValue({
+      id: BUDGET_ID,
+      user_id: USER_ID,
+      budget_item: { id: ITEM_ID, type: "EXPENSES" },
+    });
+    repository.updateBudgetItem.mockResolvedValue(expenseRow);
+
+    await expect(
+      budgetsService.updateBudgetItem({
+        userId: USER_ID,
+        budgetId: BUDGET_ID,
+        budgetItemId: ITEM_ID,
+        isChecked: true,
+      }),
+    ).resolves.toMatchObject({ isChecked: true, type: "EXPENSES" });
+    expect(repository.updateBudgetItem).toHaveBeenCalledWith({
+      budgetId: BUDGET_ID,
+      budgetItemId: ITEM_ID,
+      userId: USER_ID,
+      data: { is_checked: true },
+    });
+  });
+
+  it("rejects a checked state for an income item", async () => {
+    repository.findBudgetWithItem.mockResolvedValue({
+      id: BUDGET_ID,
+      user_id: USER_ID,
+      budget_item: { id: ITEM_ID, type: "INCOME" },
+    });
+
+    await expect(
+      budgetsService.updateBudgetItem({
+        userId: USER_ID,
+        budgetId: BUDGET_ID,
+        budgetItemId: ITEM_ID,
+        isChecked: false,
+      }),
+    ).rejects.toThrow("Only expense items can be checked");
+    expect(repository.updateBudgetItem).not.toHaveBeenCalled();
   });
 
   it("maps reordered budget items", async () => {

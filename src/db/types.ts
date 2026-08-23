@@ -22,6 +22,7 @@ export interface BudgetItemsTable {
   type: BudgetItemType;
   description: string;
   value: number;
+  is_checked: Generated<boolean>;
   position: number;
   budget_id: ColumnType<string, string, never>;
   created_at: GeneratedAlways<Date>;

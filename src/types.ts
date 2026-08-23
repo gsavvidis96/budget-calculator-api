@@ -26,6 +26,7 @@ export type BudgetItem = {
   type: BudgetItemType;
   description: string;
   value: number;
+  isChecked: boolean;
   position: number;
   budgetId: string;
   createdAt: string;

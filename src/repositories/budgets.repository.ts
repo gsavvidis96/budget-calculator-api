@@ -58,6 +58,7 @@ type CreateBudgetItemRepositoryInput = {
   budgetId: string;
   userId: string;
   description: string;
+  isChecked?: boolean;
   value: number;
   type: BudgetItemsTable["type"];
 };
@@ -68,10 +69,18 @@ export const buildCreateBudgetItemQuery = ({
   description,
   value,
   type,
+  isChecked,
 }: CreateBudgetItemRepositoryInput) => {
   return db
     .insertInto("budget_items")
-    .columns(["budget_id", "description", "value", "type", "position"])
+    .columns([
+      "budget_id",
+      "description",
+      "value",
+      "type",
+      "is_checked",
+      "position",
+    ])
     .expression((eb) =>
       eb
         .selectFrom("budgets")
@@ -80,6 +89,7 @@ export const buildCreateBudgetItemQuery = ({
           eb.val(description).as("description"),
           eb.val(value).as("value"),
           eb.val(type).as("type"),
+          eb.val(isChecked ?? false).as("is_checked"),
           sql<number>`
             COALESCE(
               (
@@ -132,6 +142,7 @@ export const createBudgetItem = async (
         description: data.description,
         value: data.value,
         type: data.type,
+        ...(data.isChecked === undefined ? {} : { is_checked: data.isChecked }),
         position: (lastItem.position ?? -1) + 1,
       })
       .returningAll()
@@ -153,7 +164,7 @@ export const findBudgetWithItem = async ({
       jsonObjectFrom(
         eb
           .selectFrom("budget_items")
-          .select("budget_items.id")
+          .select(["budget_items.id", "budget_items.type"])
           .whereRef("budget_items.budget_id", "=", "budgets.id")
           .where("budget_items.id", "=", budgetItemId),
       ).as("budget_item"),
@@ -339,7 +350,8 @@ export const buildGetBudgetWithDetailsQuery = ({
         sql<number>`
           SUM(
             CASE
-              WHEN type = 'EXPENSES' THEN value
+              WHEN type = 'EXPENSES'
+              AND NOT is_checked THEN value
               ELSE 0
             END
           )
@@ -352,10 +364,13 @@ export const buildGetBudgetWithDetailsQuery = ({
         .selectAll("budget_items_filtered")
         .select(
           sql<number>`
-            COALESCE(
-              ROUND((value / NULLIF(totals.total_income, 0)) * 100, 2),
-              0
-            )
+            CASE
+              WHEN is_checked THEN 0
+              ELSE COALESCE(
+                ROUND((value / NULLIF(totals.total_income, 0)) * 100, 2),
+                0
+              )
+            END
           `.as("expense_percentage"),
         )
         .where("type", "=", "EXPENSES"),
@@ -461,7 +476,8 @@ export const buildGetBudgetsQuery = ({
                 ) - COALESCE(
                   SUM(
                     CASE
-                      WHEN type = 'EXPENSES' THEN value
+                      WHEN type = 'EXPENSES'
+                      AND NOT is_checked THEN value
                       ELSE 0
                     END
                   ),

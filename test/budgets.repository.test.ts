@@ -27,7 +27,9 @@ describe("budget repository queries", () => {
     );
     expect(compiled.sql).not.toContain("COUNT(*) OVER ()");
     expect(compiled.sql).toContain("WHEN type = 'INCOME' THEN value");
-    expect(compiled.sql).toContain("WHEN type = 'EXPENSES' THEN value");
+    expect(compiled.sql).toMatch(
+      /WHEN type = 'EXPENSES'\s+AND NOT is_checked THEN value/,
+    );
     expect(compiled.parameters).toEqual([USER_ID, "%home%", 10, 20]);
   });
 
@@ -57,6 +59,10 @@ describe("budget repository queries", () => {
     expect(compiled.sql).toContain('"expense_items" as');
     expect(compiled.sql).toContain('"income_items" as');
     expect(compiled.sql).toContain('as "expenses_percentage"');
+    expect(compiled.sql).toContain("WHEN is_checked THEN 0");
+    expect(compiled.sql).toMatch(
+      /WHEN type = 'EXPENSES'\s+AND NOT is_checked THEN value/,
+    );
     expect(compiled.sql).toContain('order by "position", "id"');
     expect(compiled.sql).toContain('where "budgets"."id" =');
     expect(compiled.parameters).toContain(BUDGET_ID);
@@ -89,6 +95,7 @@ describe("budget repository queries", () => {
     expect(compiled.sql).toContain('and "budgets"."user_id" =');
     expect(compiled.sql).toContain("for key share");
     expect(compiled.sql).toContain("MAX(position)");
+    expect(compiled.sql).toContain('"is_checked"');
     expect(compiled.sql).toContain("returning *");
   });
 });

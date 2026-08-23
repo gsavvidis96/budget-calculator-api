@@ -37,6 +37,7 @@ type BudgetItemRow = {
   type: BudgetItem["type"];
   description: string;
   value: number;
+  is_checked: boolean;
   position: number;
   budget_id: string;
   created_at: Date | string;
@@ -61,6 +62,7 @@ const mapBudgetItem = (item: BudgetItemRow): BudgetItem => ({
   type: item.type,
   description: item.description,
   value: item.value,
+  isChecked: item.is_checked,
   position: item.position,
   budgetId: item.budget_id,
   createdAt: serializeTimestamp(item.created_at),
@@ -200,13 +202,19 @@ export const createBudgetItem = async ({
   description,
   value,
   type,
+  isChecked,
 }: CreateBudgetItemInput): Promise<BudgetItem> => {
+  if (type === "INCOME" && isChecked !== undefined) {
+    throw new BadRequestError("Only expense items can be checked");
+  }
+
   const item = await budgetsRepository.createBudgetItem({
     budgetId,
     userId,
     description,
     value,
     type,
+    isChecked,
   });
 
   if (!item) {
@@ -222,7 +230,33 @@ export const updateBudgetItem = async ({
   budgetItemId,
   description,
   value,
+  isChecked,
 }: UpdateBudgetItemInput): Promise<BudgetItem> => {
+  if (isChecked !== undefined) {
+    const budget = await budgetsRepository.findBudgetWithItem({
+      budgetId,
+      budgetItemId,
+    });
+
+    if (!budget) {
+      throw new NotFoundError("This budget does not exist.");
+    }
+
+    if (budget.user_id !== userId) {
+      throw new ForbiddenError();
+    }
+
+    if (!budget.budget_item) {
+      throw new NotFoundError(
+        `This budget item does not exist or is not part of budget with id ${budgetId}`,
+      );
+    }
+
+    if (budget.budget_item.type !== "EXPENSES") {
+      throw new BadRequestError("Only expense items can be checked");
+    }
+  }
+
   const item = await budgetsRepository.updateBudgetItem({
     budgetId,
     budgetItemId,
@@ -230,6 +264,7 @@ export const updateBudgetItem = async ({
     data: {
       ...(description === undefined ? {} : { description }),
       ...(value === undefined ? {} : { value }),
+      ...(isChecked === undefined ? {} : { is_checked: isChecked }),
     },
   });
 

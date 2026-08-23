@@ -23,16 +23,28 @@ export const updateBudgetSchema = z
     message: "At least one field must be provided",
   });
 
-export const createBudgetItemSchema = z.object({
-  description: z.string().trim().min(1),
-  value: moneySchema,
-  type: z.enum(BUDGET_ITEM_TYPES),
-});
+export const createBudgetItemSchema = z
+  .object({
+    description: z.string().trim().min(1),
+    value: moneySchema,
+    type: z.enum(BUDGET_ITEM_TYPES),
+    is_checked: z.boolean().optional(),
+  })
+  .superRefine((data, context) => {
+    if (data.type === "INCOME" && data.is_checked !== undefined) {
+      context.addIssue({
+        code: "custom",
+        message: "Only expense items can be checked",
+        path: ["is_checked"],
+      });
+    }
+  });
 
 export const updateBudgetItemSchema = z
   .object({
     description: z.string().trim().min(1).optional(),
     value: moneySchema.optional(),
+    is_checked: z.boolean().optional(),
   })
   .strict()
   .refine((data) => Object.values(data).some((value) => value !== undefined), {
@@ -109,6 +121,7 @@ export type DeleteBudgetInput = GetBudgetInput;
 export type CreateBudgetItemInput = {
   budgetId: string;
   description: string;
+  isChecked?: boolean;
   type: (typeof BUDGET_ITEM_TYPES)[number];
   userId: string;
   value: number;
@@ -118,6 +131,7 @@ export type UpdateBudgetItemInput = {
   budgetId: string;
   budgetItemId: string;
   description?: string;
+  isChecked?: boolean;
   userId: string;
   value?: number;
 };

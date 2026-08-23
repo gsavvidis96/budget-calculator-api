@@ -44,6 +44,7 @@ const incomeItem = {
   type: "INCOME" as const,
   description: "Salary",
   value: 2500,
+  isChecked: false,
   position: 0,
   budgetId: BUDGET_ID,
   createdAt: "2026-08-19T08:00:00.000Z",
@@ -107,6 +108,7 @@ describe("budget routes", () => {
           type: "EXPENSES",
           description: "Rent",
           value: 250,
+          isChecked: true,
           expensePercentage: 10,
         },
       ],
@@ -127,6 +129,7 @@ describe("budget routes", () => {
         {
           budget_id: BUDGET_ID,
           expense_percentage: 10,
+          is_checked: true,
         },
       ],
       income_items: [{ budget_id: BUDGET_ID }],
@@ -176,7 +179,7 @@ describe("budget routes", () => {
       budgetItemId: ITEM_ID,
       description: "Salary",
       value: 2500,
-      type: undefined,
+      isChecked: undefined,
     });
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({
@@ -185,6 +188,59 @@ describe("budget routes", () => {
       type: "INCOME",
       position: 0,
     });
+  });
+
+  it("maps and returns an expense checked-state toggle", async () => {
+    service.updateBudgetItem.mockResolvedValue({
+      ...incomeItem,
+      type: "EXPENSES",
+      description: "Rent",
+      isChecked: true,
+    });
+
+    const response = await app.request(
+      `/budgets/${BUDGET_ID}/budget-items/${ITEM_ID}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_checked: true }),
+      },
+    );
+
+    expect(service.updateBudgetItem).toHaveBeenCalledWith({
+      userId: USER_ID,
+      budgetId: BUDGET_ID,
+      budgetItemId: ITEM_ID,
+      description: undefined,
+      value: undefined,
+      isChecked: true,
+    });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      id: ITEM_ID,
+      type: "EXPENSES",
+      is_checked: true,
+    });
+  });
+
+  it("rejects is_checked when creating an income item", async () => {
+    const response = await app.request(`/budgets/${BUDGET_ID}/budget-items`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "INCOME",
+        description: "Salary",
+        value: 2500,
+        is_checked: false,
+      }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({
+      message: "Validation failed",
+      errors: [{ field: "is_checked" }],
+    });
+    expect(service.createBudgetItem).not.toHaveBeenCalled();
   });
 
   it("maps and returns a complete reordered item sequence", async () => {

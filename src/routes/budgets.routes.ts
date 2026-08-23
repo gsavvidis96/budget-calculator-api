@@ -43,6 +43,7 @@ const toBudgetItemResponse = (item: BudgetItem) => ({
   type: item.type,
   description: item.description,
   value: item.value,
+  ...(item.type === "EXPENSES" ? { is_checked: item.isChecked } : {}),
   position: item.position,
   budget_id: item.budgetId,
   created_at: item.createdAt,
@@ -168,6 +169,7 @@ budgetsRoutes.post(
       description: body.description,
       value: body.value,
       type: body.type,
+      isChecked: body.is_checked,
     });
 
     return c.json(toBudgetItemResponse(item));
@@ -188,6 +190,7 @@ budgetsRoutes.patch(
       budgetItemId,
       description: body.description,
       value: body.value,
+      isChecked: body.is_checked,
     });
 
     return c.json(toBudgetItemResponse(item));
